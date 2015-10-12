@@ -1,11 +1,18 @@
 package com.example.sifat.gobar;
 
+import com.example.sifat.Utilities.LocationProvider;
 import com.github.polok.routedrawer.RouteApi;
 import com.github.polok.routedrawer.RouteDrawer;
 import com.github.polok.routedrawer.RouteRest;
 import com.github.polok.routedrawer.model.Routes;
 import com.github.polok.routedrawer.model.TravelMode;
 import com.github.polok.routedrawer.parser.RouteJsonParser;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -17,11 +24,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -29,6 +38,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +58,11 @@ import rx.functions.Func1;
 /**
  * This shows how to create a simple activity with a map and a marker on the map.
  */
-public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback, View.OnClickListener,RouteApi, SearchView.OnQueryTextListener {
+public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback,
+        View.OnClickListener,RouteApi,
+        SearchView.OnQueryTextListener,GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private GoogleMap mMap;
     private UiSettings mUiSettings;
@@ -58,6 +72,16 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     List<Address> addressList;
     private Toolbar toolbar;
     private SearchView searchView;
+    private LocationProvider locationProvider;
+    private LocationRequest mLocationRequest;
+    private int UPDATE_INTERVAL = 10000; // 10 sec
+    private int FATEST_INTERVAL = 5000; // 5 sec
+    private int DISPLACEMENT = 10; // 10 meters
+    private int count;
+    private float minAccuracy;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,39 +89,23 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         Toast.makeText(this,"On Create",Toast.LENGTH_SHORT).show();
-        initLayout();
+        init();
 
         MapFragment mapFragment =
                 (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
-    private void initLayout() {
+    private void init() {
         toolbar= (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-        //btSearch= (Button) findViewById(R.id.btSearch);
-        //etLocation = (EditText) findViewById(R.id.etLocation);
-        //btSearch.setOnClickListener(this);
+        minAccuracy = 5.0f;
+        getMyLocation();
     }
 
     @Override
     public void onClick(View view) {
-        String location= "Dhaka";
-        //etLocation.getText().toString();
-        Toast.makeText(this,location,Toast.LENGTH_SHORT).show();
-        if(location!=null && location!="")
-        {
-            geocoder = new Geocoder(this);
-            try {
-                addressList = geocoder.getFromLocationName(location,1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Address address = addressList.get(0);
-            LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        }
+
     }
 
 
@@ -108,7 +116,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         mMap=map;
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.setMyLocationEnabled(true);
         mMap.setBuildingsEnabled(true);
         mUiSettings = mMap.getUiSettings();
@@ -123,6 +132,127 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         mUiSettings.setTiltGesturesEnabled(true);
         mUiSettings.setRotateGesturesEnabled(true);
 
+        //getRoute();
+
+    }
+
+    /********
+     *
+     *  Get My Location & set starting marker
+     *
+     * *******/
+
+    private void getMyLocation()
+    {
+        if (checkPlayServices()) {
+            buildGoogleApiClient();
+            mGoogleApiClient.connect();
+        }
+    }
+
+    /**
+     * Creating google api client object
+     * */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        createLocationRequest();
+        startLocationUpdates();
+    }
+
+    private void getLatLng() {
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+            float accuracy=mLastLocation.getAccuracy();
+            Toast.makeText(this,"Lat : "+latitude+"\nLong : "+longitude+"\nAccuracy : "+
+                    mLastLocation.getAccuracy()+"\nMin : "+minAccuracy,Toast.LENGTH_SHORT).show();
+            stopLocationUpdates();
+            LatLng myLatLng = new LatLng(latitude,longitude);
+            mMap.addMarker(new MarkerOptions().position(myLatLng).title("Marker"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(myLatLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomBy(13));
+
+        }
+
+    }
+
+
+    /**
+     * Creating location request object
+     * */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+    }
+
+    /**
+     * Starting the location updates
+     **/
+    protected void startLocationUpdates() {
+        Toast.makeText(this,"startLocationUpdates",Toast.LENGTH_SHORT).show();
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+
+    }
+
+    /**
+     * Stopping the location updates
+     * */
+    private void stopLocationUpdates() {
+        Toast.makeText(this,"stopLocationUpdates",Toast.LENGTH_SHORT).show();
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation=location;
+        getLatLng();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(this,"Failed to detect current location",Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    /**
+     * Method to verify google play services on the device
+     * */
+    private boolean checkPlayServices() {
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            return true;
+        } else {
+            Toast.makeText(this, "Google play service not found", Toast.LENGTH_LONG).show();
+            return false;
+        }
+    }
+
+
+    /********
+     *
+     *  Get A route Between source & destination
+     *
+     * ********/
+
+
+    private void getRoute()
+    {
         final RouteDrawer routeDrawer = new RouteDrawer.RouteDrawerBuilder(mMap)
                 .withColor(Color.BLUE)
                 .withWidth(5)
@@ -148,10 +278,20 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
     }
 
+
     @Override
     public Observable<String> getJsonDirections(LatLng latLng, LatLng latLng1, TravelMode travelMode) {
         return null;
     }
+
+
+
+    /*******
+     *
+     *  Search bar Operation
+     *
+     * ******/
+
 
     @Override
     public boolean onQueryTextSubmit(String location) {
@@ -174,9 +314,17 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onQueryTextChange(String s) {
-        Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
         return false;
     }
+
+
+
+    /******
+     *
+     *  Menu Settings
+     *
+     * ****/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -205,5 +353,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         }
 
         return false;
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mGoogleApiClient.disconnect();
     }
 }
