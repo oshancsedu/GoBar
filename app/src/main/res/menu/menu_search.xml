@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.sifat.gobar.MapsActivity" >
+
+    <item
+        android:id="@+id/Search"
+        android:alphabeticShortcut="b"
+        android:numericShortcut="2"
+        android:title="Search Bus"
+        android:icon="@drawable/ic_action_search"
+        android:orderInCategory="200"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
+
+    <item
+        android:id="@+id/exit"
+        android:alphabeticShortcut="c"
+        android:numericShortcut="3"
+        android:title="Exit"/>
+
+</menu>
