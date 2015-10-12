@@ -20,7 +20,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.app.Activity;
@@ -81,7 +83,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private float minAccuracy;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-
+    private CameraPosition showMyLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,9 +177,25 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                     mLastLocation.getAccuracy()+"\nMin : "+minAccuracy,Toast.LENGTH_SHORT).show();
             stopLocationUpdates();
             LatLng myLatLng = new LatLng(latitude,longitude);
-            mMap.addMarker(new MarkerOptions().position(myLatLng).title("Marker"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(myLatLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomBy(13));
+
+            mMap.addMarker(new MarkerOptions()
+                            .position(myLatLng)
+                            .title("Marker")
+            );
+
+            mMap.addMarker(new MarkerOptions()
+                            .position(myLatLng)
+                            .title("Marker")
+                            .draggable(true)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.myposition))
+            );
+
+            showMyLocation = new CameraPosition.Builder().target(myLatLng)
+                    .zoom(15.5f)
+                    .bearing(340)
+                    .tilt(50)
+                    .build();
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(showMyLocation),4000,null);
 
         }
 
