@@ -1,5 +1,6 @@
 package com.example.sifat.gobar;
 
+import com.example.sifat.Services.AddressFetcher;
 import com.example.sifat.Utilities.LocationProvider;
 import com.github.polok.routedrawer.RouteApi;
 import com.github.polok.routedrawer.RouteDrawer;
@@ -40,6 +41,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -64,13 +67,16 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import static com.example.sifat.Utilities.CommonUtilities.*;
+
 
 /**
  * This shows how to create a simple activity with a map and a marker on the map.
  */
 public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback,
         View.OnClickListener,RouteApi,
-        SearchView.OnQueryTextListener,GoogleMap.OnCameraChangeListener {
+        SearchView.OnQueryTextListener,
+        GoogleMap.OnCameraChangeListener {
 
     private GoogleMap mMap;
     private UiSettings mUiSettings;
@@ -92,6 +98,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private CameraPosition showMyLocation;
     private SharedPreferences sharedpreferences;
     private SharedPreferences.Editor editor;
+    private AddressResultReceiver mResultReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +127,11 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         btNextAction.setOnClickListener(this);
 
         //getMyLocation();
+
+        //initializing My Custom receiver
+
+        mResultReceiver= new AddressResultReceiver(new Handler());
+        //mResultReceiver.setReceiver(this);
 
     }
 
@@ -190,57 +202,11 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         if(!flag && initMarker)
         locationProvider.finish();
         LatLng newLatLng= cameraPosition.target;
-        new LocationAsynctask().execute(newLatLng);
+        //new LocationAsynctask().execute(newLatLng);
+        startIntentService(newLatLng);
         //Toast.makeText(this,getMyLocationAddress(newLatLng),Toast.LENGTH_SHORT).show();
 
     }
-
-
-
-    /*****
-     *
-     * Get My Location From LatLong
-     *
-     ******/
-
-    public String getMyLocationAddress(LatLng latLng)
-    {
-
-        Geocoder geocoder= new Geocoder(this, Locale.getDefault());
-
-        try {
-
-            //Place your latitude and longitude
-            List<Address> addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude, 1);
-
-            if(addresses != null && addresses.size()>=1)
-            {
-
-                Address fetchedAddress = addresses.get(0);
-                StringBuilder strAddress = new StringBuilder();
-
-                for(int i=0; i<fetchedAddress.getMaxAddressLineIndex(); i++)
-                {
-                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
-                }
-
-                return  strAddress.toString();
-
-            }
-
-            else
-                return "No location found..!";
-
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(),"Could not get address..!", Toast.LENGTH_LONG).show();
-            return "Could not get address..!";
-        }
-    }
-
-
 
 
     /********
@@ -364,21 +330,46 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         //mGoogleApiClient.disconnect();
     }
 
-    class LocationAsynctask extends AsyncTask<LatLng,Void,String>
-    {
-        @Override
-        protected void onPreExecute() {
+    /*****
+     *
+     * Get My Location From LatLong through starting a service
+     *
+     ******/
 
+
+    protected void startIntentService(LatLng latlng) {
+        Intent intent = new Intent(this, AddressFetcher.class);
+        intent.putExtra(ADDRESS_RECIEVER, mResultReceiver);
+        intent.putExtra(LATLNG_DATA_EXTRA, latlng);
+        //Toast.makeText(this,"Start",Toast.LENGTH_SHORT).show();
+        startService(intent);
+    }
+
+    /*****
+     *
+     *  Get Resulted address from service
+     *
+     * ****/
+
+    class AddressResultReceiver extends ResultReceiver {
+
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
         }
 
         @Override
-        protected String doInBackground(LatLng... latLngs) {
-            return getMyLocationAddress(latLngs[0]);
-        }
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            Log.i(LOG_TAG_SERVICE,"OnRecieve");
+            // Display the address string
+            // or an error message sent from the intent service.
+            String address = resultData.getString(RESULT_ADDRESS_KEY);
+            tvAddress.setText(address);
 
-        @Override
-        protected void onPostExecute(String location) {
-            tvAddress.setText(location);
+            // Show a toast message if an address was found.
+            /*if (resultCode == SUCCESS_RESULT) {
+                Toast.makeText(MapsActivity.this,"Address Found",Toast.LENGTH_SHORT).show();
+            }*/
+
         }
     }
 

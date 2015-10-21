@@ -26,7 +26,7 @@
             android:value="@string/google_maps_key" />
 
         <service android:name="com.example.sifat.Services.TaxiLocation" />
-        <service android:name="com.example.sifat.Services.AddressFetcher" />
+        <service android:name="com.example.sifat.Services.AddressFetcher"/>
 
         <activity
             android:name=".MapsActivity"
