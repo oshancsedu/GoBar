@@ -8,11 +8,14 @@ import com.github.polok.routedrawer.model.Routes;
 import com.github.polok.routedrawer.model.TravelMode;
 import com.github.polok.routedrawer.parser.RouteJsonParser;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -29,11 +32,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
@@ -46,10 +51,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -62,14 +70,12 @@ import rx.functions.Func1;
  */
 public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback,
         View.OnClickListener,RouteApi,
-        SearchView.OnQueryTextListener,GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        SearchView.OnQueryTextListener,GoogleMap.OnCameraChangeListener {
 
     private GoogleMap mMap;
     private UiSettings mUiSettings;
-    private EditText etLocation;
-    private Button btSearch;
+    private TextView tvAddress;
+    private ImageButton btBacktoMyPosition,btNextAction;
     private Geocoder geocoder;
     List<Address> addressList;
     private Toolbar toolbar;
@@ -84,13 +90,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private CameraPosition showMyLocation;
+    private SharedPreferences sharedpreferences;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        Toast.makeText(this,"On Create",Toast.LENGTH_SHORT).show();
         init();
 
         MapFragment mapFragment =
@@ -99,17 +105,49 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
     private void init() {
+        sharedpreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), Context.MODE_PRIVATE);
+        editor=sharedpreferences.edit();
+        editor.putBoolean("flag",true);
+        editor.putBoolean("init",false);
+        editor.commit();
         toolbar= (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         minAccuracy = 5.0f;
-        getMyLocation();
+        tvAddress= (TextView) findViewById(R.id.tvAddrss);
+        btBacktoMyPosition= (ImageButton) findViewById(R.id.ibMyLocation);
+        btBacktoMyPosition.setOnClickListener(this);
+        btNextAction= (ImageButton) findViewById(R.id.ibNextAction);
+        btNextAction.setOnClickListener(this);
+
+        //getMyLocation();
+
     }
 
     @Override
     public void onClick(View view) {
-
+        if(view.getId()== R.id.ibMyLocation)
+        {
+            locationProvider.getMyLocaton();
+        }
+        else if(view.getId()==R.id.ibNextAction)
+        {
+            int PLACE_PICKER_REQUEST = 1;
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            //PlacePicker.get
+            try {
+                startActivityForResult(builder.build(MapsActivity.this), PLACE_PICKER_REQUEST);
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
@@ -118,148 +156,91 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         mMap=map;
-
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        mMap.setOnCameraChangeListener(this);
         mMap.setMyLocationEnabled(true);
         mMap.setBuildingsEnabled(true);
-        mUiSettings = mMap.getUiSettings();
 
         // Keep the UI Settings state in sync with the checkboxes.
+        mUiSettings = mMap.getUiSettings();
         mUiSettings.setZoomControlsEnabled(true);
         mUiSettings.setCompassEnabled(true);
         mUiSettings.setMyLocationButtonEnabled(true);
-        mMap.setMyLocationEnabled(true);
         mUiSettings.setScrollGesturesEnabled(true);
         mUiSettings.setZoomGesturesEnabled(true);
         mUiSettings.setTiltGesturesEnabled(true);
         mUiSettings.setRotateGesturesEnabled(true);
 
+        locationProvider = new LocationProvider(this,mMap,editor,sharedpreferences);
+        locationProvider.getMyLocaton();
+
         //getRoute();
+    }
+
+    /**********
+     *
+     * Get New LatLong When Camera is changed
+     *
+     * ********/
+
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+
+        boolean flag=sharedpreferences.getBoolean("flag",true);
+        boolean initMarker= sharedpreferences.getBoolean("init",true);
+        if(!flag && initMarker)
+        locationProvider.finish();
+        LatLng newLatLng= cameraPosition.target;
+        new LocationAsynctask().execute(newLatLng);
+        //Toast.makeText(this,getMyLocationAddress(newLatLng),Toast.LENGTH_SHORT).show();
 
     }
 
-    /********
-     *
-     *  Get My Location & set starting marker
-     *
-     * *******/
 
-    private void getMyLocation()
+
+    /*****
+     *
+     * Get My Location From LatLong
+     *
+     ******/
+
+    public String getMyLocationAddress(LatLng latLng)
     {
-        if (checkPlayServices()) {
-            buildGoogleApiClient();
-            mGoogleApiClient.connect();
+
+        Geocoder geocoder= new Geocoder(this, Locale.getDefault());
+
+        try {
+
+            //Place your latitude and longitude
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude, 1);
+
+            if(addresses != null && addresses.size()>=1)
+            {
+
+                Address fetchedAddress = addresses.get(0);
+                StringBuilder strAddress = new StringBuilder();
+
+                for(int i=0; i<fetchedAddress.getMaxAddressLineIndex(); i++)
+                {
+                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
+                }
+
+                return  strAddress.toString();
+
+            }
+
+            else
+                return "No location found..!";
+
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(),"Could not get address..!", Toast.LENGTH_LONG).show();
+            return "Could not get address..!";
         }
     }
 
-    /**
-     * Creating google api client object
-     * */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-    }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        createLocationRequest();
-        startLocationUpdates();
-    }
-
-    private void getLatLng() {
-        if (mLastLocation != null) {
-            double latitude = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-            float accuracy=mLastLocation.getAccuracy();
-            Toast.makeText(this,"Lat : "+latitude+"\nLong : "+longitude+"\nAccuracy : "+
-                    mLastLocation.getAccuracy()+"\nMin : "+minAccuracy,Toast.LENGTH_SHORT).show();
-            stopLocationUpdates();
-            LatLng myLatLng = new LatLng(latitude,longitude);
-
-            mMap.addMarker(new MarkerOptions()
-                            .position(myLatLng)
-                            .title("Marker")
-            );
-
-            mMap.addMarker(new MarkerOptions()
-                            .position(myLatLng)
-                            .title("Marker")
-                            .draggable(true)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.myposition))
-            );
-
-            showMyLocation = new CameraPosition.Builder().target(myLatLng)
-                    .zoom(15.5f)
-                    .bearing(340)
-                    .tilt(50)
-                    .build();
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(showMyLocation),4000,null);
-
-        }
-
-    }
-
-
-    /**
-     * Creating location request object
-     * */
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
-    }
-
-    /**
-     * Starting the location updates
-     **/
-    protected void startLocationUpdates() {
-        Toast.makeText(this,"startLocationUpdates",Toast.LENGTH_SHORT).show();
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-
-    }
-
-    /**
-     * Stopping the location updates
-     * */
-    private void stopLocationUpdates() {
-        Toast.makeText(this,"stopLocationUpdates",Toast.LENGTH_SHORT).show();
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mLastLocation=location;
-        getLatLng();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(this,"Failed to detect current location",Toast.LENGTH_SHORT).show();
-        return;
-    }
-
-    /**
-     * Method to verify google play services on the device
-     * */
-    private boolean checkPlayServices() {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
-            return true;
-        } else {
-            Toast.makeText(this, "Google play service not found", Toast.LENGTH_LONG).show();
-            return false;
-        }
-    }
 
 
     /********
@@ -333,6 +314,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     @Override
     public boolean onQueryTextChange(String s) {
         //Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
+
         return false;
     }
 
@@ -378,6 +360,26 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mGoogleApiClient.disconnect();
+        locationProvider.finish();
+        //mGoogleApiClient.disconnect();
     }
+
+    class LocationAsynctask extends AsyncTask<LatLng,Void,String>
+    {
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected String doInBackground(LatLng... latLngs) {
+            return getMyLocationAddress(latLngs[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String location) {
+            tvAddress.setText(location);
+        }
+    }
+
 }
