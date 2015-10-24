@@ -28,6 +28,8 @@
         <service android:name="com.example.sifat.Services.TaxiLocation" />
         <service android:name="com.example.sifat.Services.AddressFetcher"/>
 
+        <receiver android:name="com.example.sifat.Receiver.TaxiDetailReceiver"/>
+
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" >

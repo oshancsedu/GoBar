@@ -126,8 +126,11 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks,
 
     public void finish()
     {
-        stopLocationUpdates();
-        mGoogleApiClient.disconnect();
+        if(mGoogleApiClient.isConnected())
+        {
+            stopLocationUpdates();
+            mGoogleApiClient.disconnect();
+        }
     }
 
     /**

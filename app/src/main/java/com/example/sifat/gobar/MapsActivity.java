@@ -1,6 +1,9 @@
 package com.example.sifat.gobar;
 
+import com.example.sifat.Domain.TaxiDetail;
+import com.example.sifat.Receiver.TaxiDetailReceiver;
 import com.example.sifat.Services.AddressFetcher;
+import com.example.sifat.Services.TaxiLocation;
 import com.example.sifat.Utilities.LocationProvider;
 import com.github.polok.routedrawer.RouteApi;
 import com.github.polok.routedrawer.RouteDrawer;
@@ -30,6 +33,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,6 +48,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -59,6 +65,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -98,7 +105,15 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private CameraPosition showMyLocation;
     private SharedPreferences sharedpreferences;
     private SharedPreferences.Editor editor;
-    private AddressResultReceiver mResultReceiver;
+    private AddressResultReceiver mAddressResultReceiver;
+    private TaxiDetailResultReceiver taxiDetailResultReceiver;
+    private ArrayList<TaxiDetail> taxiDetails= new ArrayList<>();
+    private ArrayList<Marker> markers=new ArrayList<>();
+    private AlarmManager alarmManager;
+    private Intent taxiDetailIntent;
+    private PendingIntent pendingIntent;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +124,16 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         MapFragment mapFragment =
                 (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //Starting service for the taxi position
+        //startTaxiDetailService();
+
+        startAlarmManager();
     }
 
     private void init() {
@@ -130,7 +155,9 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         //initializing My Custom receiver
 
-        mResultReceiver= new AddressResultReceiver(new Handler());
+        mAddressResultReceiver= new AddressResultReceiver(new Handler());
+        taxiDetailResultReceiver = new TaxiDetailResultReceiver(new Handler());
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"inti receiver");
         //mResultReceiver.setReceiver(this);
 
     }
@@ -186,6 +213,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         locationProvider.getMyLocaton();
 
         //getRoute();
+        //startAlarmManager();
     }
 
     /**********
@@ -198,12 +226,12 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     public void onCameraChange(CameraPosition cameraPosition) {
 
         boolean flag=sharedpreferences.getBoolean("flag",true);
-        boolean initMarker= sharedpreferences.getBoolean("init",true);
+        boolean initMarker= sharedpreferences.getBoolean("init", true);
         if(!flag && initMarker)
         locationProvider.finish();
         LatLng newLatLng= cameraPosition.target;
         //new LocationAsynctask().execute(newLatLng);
-        startIntentService(newLatLng);
+        startLocationIntentService(newLatLng);
         //Toast.makeText(this,getMyLocationAddress(newLatLng),Toast.LENGTH_SHORT).show();
 
     }
@@ -322,6 +350,11 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cancelAlarmManager();
+    }
 
     @Override
     protected void onDestroy() {
@@ -337,13 +370,21 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
      ******/
 
 
-    protected void startIntentService(LatLng latlng) {
+    protected void startLocationIntentService(LatLng latlng) {
         Intent intent = new Intent(this, AddressFetcher.class);
-        intent.putExtra(ADDRESS_RECIEVER, mResultReceiver);
+        intent.putExtra(ADDRESS_RECIEVER, mAddressResultReceiver);
         intent.putExtra(LATLNG_DATA_EXTRA, latlng);
         //Toast.makeText(this,"Start",Toast.LENGTH_SHORT).show();
         startService(intent);
     }
+
+    /*protected  void startTaxiDetailService()
+    {
+        Intent intent = new Intent(this, TaxiLocation.class);
+        intent.putExtra(TAXIDETAIL_RECIEVER, taxiDetailResultReceiver);
+        //Toast.makeText(this,"Start",Toast.LENGTH_SHORT).show();
+        startService(intent);
+    }*/
 
     /*****
      *
@@ -373,4 +414,112 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         }
     }
 
+
+    /*****
+     *
+     *  Get Resulted TaxiDetail Information from service
+     *
+     * ****/
+
+    class TaxiDetailResultReceiver extends ResultReceiver {
+
+        public TaxiDetailResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"On Recieve");
+            // Display the address string
+            // or an error message sent from the intent service.
+            taxiDetails = (ArrayList<TaxiDetail>) resultData.getSerializable(RESULT_TAXIDETAIL_KEY);
+
+            for(int i=0;i<taxiDetails.size();i++)
+            {
+                Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Name: "+taxiDetails.get(i).getDriverName());
+            }
+
+            setMarkers(taxiDetails);
+
+            // Show a toast message if an address was found.
+            /*if (resultCode == SUCCESS_RESULT) {
+                Toast.makeText(MapsActivity.this,"Address Found",Toast.LENGTH_SHORT).show();
+            }*/
+
+        }
+    }
+
+    /********
+     *
+     * Add Taxi Marker to map
+     *
+     * ********/
+    void setMarkers(ArrayList<TaxiDetail> taxiDetails)
+    {
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Setting marker");
+        Marker marker;
+        if(markers.size()==0 || markers==null)
+        {
+            Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Size "+taxiDetails.size());
+            for(int i =0;i<taxiDetails.size();i++)
+            {
+                Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Driver name "+taxiDetails.get(i).getDriverName());
+                LatLng latlng=new LatLng(taxiDetails.get(i).getLatitude(),taxiDetails.get(i).getLongitude());
+                marker = mMap.addMarker(new MarkerOptions().position(latlng).title(taxiDetails.get(i).getDriverName()).flat(true));
+                //markers.add(marker);
+            }
+            //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+        }
+        else
+        {
+            Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Size "+markers.size());
+            /*for(int i =0;i<taxiDetails.size();i++)
+            {
+                LatLng latlng=new LatLng(taxiDetails.get(i).getLatitude(),taxiDetails.get(i).getLongitude());
+                marker = mMap.addMarker(new MarkerOptions().position(latlng).title(taxiDetails.get(i).getDriverName()).flat(true));
+                markers.add(marker);
+            }*/
+        }
+    }
+
+
+    /*******
+     *
+     * Starting Alarm Manager
+     *
+     * ******/
+
+    private void startAlarmManager() {
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE, "startAlarmManager");
+
+        Context context = getBaseContext();
+        alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        taxiDetailIntent = new Intent(context, TaxiDetailReceiver.class);
+        taxiDetailIntent.putExtra(TAXIDETAIL_RECIEVER, taxiDetailResultReceiver);
+        //taxiDetailIntent.putExtra(GMAP_KEY, mMap);
+        taxiDetailIntent.putExtra("test", "Oshan");
+        pendingIntent = PendingIntent.getBroadcast(context, 0, taxiDetailIntent, 0);
+        //pendingIntent.
+
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime(),
+                10000, // 10 sec
+                pendingIntent);
+    }
+
+
+    /*******
+     *
+     * Stoping Alarm Manager
+     *
+     * ******/
+    private void cancelAlarmManager() {
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE, "cancelAlarmManager");
+
+        Context context = getBaseContext();
+        //Intent gpsTrackerIntent = new Intent(context, TaxiDetailReceiver.class);
+        //PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, gpsTrackerIntent, 0);
+        //AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
 }
