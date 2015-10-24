@@ -88,7 +88,10 @@ public class TaxiLocation extends IntentService{
         //Log.i(LOG_TAG_SERVICE,"Deliver -> "+message);
         Bundle bundle = new Bundle();
         bundle.putSerializable(RESULT_TAXIDETAIL_KEY, taxiInfo);
-        Log.i(LOG_TAG_TAXIPOSITIONSERVICE, "Sending -> " + taxiInfo.get(3).getDriverName() + " " + resultReceiver.getClass());
-        resultReceiver.send(resultCode, bundle);
+        //Log.i(LOG_TAG_TAXIPOSITIONSERVICE, "Sending -> " + taxiInfo.get(3).getDriverName() + " " + resultReceiver.getClass());
+        Intent i = new Intent("taxi.position.information");
+        i.putExtras(bundle);
+        sendBroadcast(i);
+        //resultReceiver.send(resultCode, bundle);
     }
 }

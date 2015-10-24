@@ -35,9 +35,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
@@ -107,6 +109,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private SharedPreferences.Editor editor;
     private AddressResultReceiver mAddressResultReceiver;
     private TaxiDetailResultReceiver taxiDetailResultReceiver;
+    private boolean taxiDetailReceiverResgistered;
     private ArrayList<TaxiDetail> taxiDetails= new ArrayList<>();
     private ArrayList<Marker> markers=new ArrayList<>();
     private AlarmManager alarmManager;
@@ -130,10 +133,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
 
-        //Starting service for the taxi position
-        //startTaxiDetailService();
-
+        //Resgistering my custom broadcast receiver
+        if (!taxiDetailReceiverResgistered) {
+            registerReceiver(taxiDetailResultReceiver, new IntentFilter("taxi.position.information"));
+            taxiDetailReceiverResgistered = true;
+        }
         startAlarmManager();
+
     }
 
     private void init() {
@@ -153,13 +159,10 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         //getMyLocation();
 
-        //initializing My Custom receiver
-
+        //initializing My Custom receivers
         mAddressResultReceiver= new AddressResultReceiver(new Handler());
-        taxiDetailResultReceiver = new TaxiDetailResultReceiver(new Handler());
-        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"inti receiver");
-        //mResultReceiver.setReceiver(this);
-
+        taxiDetailResultReceiver= new TaxiDetailResultReceiver();
+        //Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"inti receiver");
     }
 
     @Override
@@ -354,6 +357,12 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     protected void onPause() {
         super.onPause();
         cancelAlarmManager();
+
+        //Unresgistering my custom broadcast receiver
+        if (taxiDetailReceiverResgistered) {
+            unregisterReceiver(taxiDetailResultReceiver);
+            taxiDetailReceiverResgistered = false;
+        }
     }
 
     @Override
@@ -377,14 +386,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         //Toast.makeText(this,"Start",Toast.LENGTH_SHORT).show();
         startService(intent);
     }
-
-    /*protected  void startTaxiDetailService()
-    {
-        Intent intent = new Intent(this, TaxiLocation.class);
-        intent.putExtra(TAXIDETAIL_RECIEVER, taxiDetailResultReceiver);
-        //Toast.makeText(this,"Start",Toast.LENGTH_SHORT).show();
-        startService(intent);
-    }*/
 
     /*****
      *
@@ -421,31 +422,17 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
      *
      * ****/
 
-    class TaxiDetailResultReceiver extends ResultReceiver {
-
-        public TaxiDetailResultReceiver(Handler handler) {
-            super(handler);
-        }
+    class TaxiDetailResultReceiver extends BroadcastReceiver {
 
         @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
+        public void onReceive(Context context, Intent intent) {
             Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"On Recieve");
             // Display the address string
             // or an error message sent from the intent service.
-            taxiDetails = (ArrayList<TaxiDetail>) resultData.getSerializable(RESULT_TAXIDETAIL_KEY);
-
-            for(int i=0;i<taxiDetails.size();i++)
-            {
-                Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Name: "+taxiDetails.get(i).getDriverName());
-            }
-
+            Bundle bundle;
+            bundle=intent.getExtras();
+            taxiDetails = (ArrayList<TaxiDetail>) bundle.getSerializable(RESULT_TAXIDETAIL_KEY);
             setMarkers(taxiDetails);
-
-            // Show a toast message if an address was found.
-            /*if (resultCode == SUCCESS_RESULT) {
-                Toast.makeText(MapsActivity.this,"Address Found",Toast.LENGTH_SHORT).show();
-            }*/
-
         }
     }
 
@@ -495,11 +482,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         Context context = getBaseContext();
         alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         taxiDetailIntent = new Intent(context, TaxiDetailReceiver.class);
-        taxiDetailIntent.putExtra(TAXIDETAIL_RECIEVER, taxiDetailResultReceiver);
-        //taxiDetailIntent.putExtra(GMAP_KEY, mMap);
-        taxiDetailIntent.putExtra("test", "Oshan");
         pendingIntent = PendingIntent.getBroadcast(context, 0, taxiDetailIntent, 0);
-        //pendingIntent.
 
         alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime(),
@@ -516,7 +499,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private void cancelAlarmManager() {
         Log.i(LOG_TAG_TAXIPOSITIONSERVICE, "cancelAlarmManager");
 
-        Context context = getBaseContext();
+        //Context context = getBaseContext();
         //Intent gpsTrackerIntent = new Intent(context, TaxiDetailReceiver.class);
         //PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, gpsTrackerIntent, 0);
         //AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
