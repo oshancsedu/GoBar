@@ -78,11 +78,6 @@ public class TaxiLocation extends IntentService{
         stopSelf();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Toast.makeText(this,"Stoping service",Toast.LENGTH_SHORT).show();
-    }
     private void deliverResultToReceiver(int resultCode, ArrayList<TaxiDetail> taxiInfo)
     {
         //Log.i(LOG_TAG_SERVICE,"Deliver -> "+message);

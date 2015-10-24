@@ -103,7 +103,7 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks,
                     .bearing(340)
                     .tilt(50)
                     .build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(showMyLocation), 4000, null);
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(showMyLocation), 2000, null);
 
             editor.putBoolean("init", true);
             editor.commit();

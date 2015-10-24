@@ -63,6 +63,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +92,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private UiSettings mUiSettings;
     private TextView tvAddress;
     private ImageButton btBacktoMyPosition,btNextAction;
+    private Button btDestCancel;
     private Geocoder geocoder;
     List<Address> addressList;
     private Toolbar toolbar;
@@ -115,7 +117,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private AlarmManager alarmManager;
     private Intent taxiDetailIntent;
     private PendingIntent pendingIntent;
-
+    private LinearLayout hirePanel,destPanel;
 
 
     @Override
@@ -152,12 +154,18 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         setSupportActionBar(toolbar);
         minAccuracy = 5.0f;
         tvAddress= (TextView) findViewById(R.id.tvAddrss);
+
+        hirePanel= (LinearLayout) findViewById(R.id.llHirePanel);
+        hirePanel.setVisibility(View.INVISIBLE);
+        destPanel= (LinearLayout) findViewById(R.id.llDestinationPanel);
+        destPanel.setVisibility(View.INVISIBLE);
+
         btBacktoMyPosition= (ImageButton) findViewById(R.id.ibMyLocation);
         btBacktoMyPosition.setOnClickListener(this);
         btNextAction= (ImageButton) findViewById(R.id.ibNextAction);
         btNextAction.setOnClickListener(this);
-
-        //getMyLocation();
+        btDestCancel= (Button) findViewById(R.id.btDistinationCancel);
+        btDestCancel.setOnClickListener(this);
 
         //initializing My Custom receivers
         mAddressResultReceiver= new AddressResultReceiver(new Handler());
@@ -173,16 +181,20 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         }
         else if(view.getId()==R.id.ibNextAction)
         {
-            int PLACE_PICKER_REQUEST = 1;
-            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-            //PlacePicker.get
-            try {
-                startActivityForResult(builder.build(MapsActivity.this), PLACE_PICKER_REQUEST);
-            } catch (GooglePlayServicesRepairableException e) {
-                e.printStackTrace();
-            } catch (GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
-            }
+            mapUiSetting(false);
+            /*hirePanel.setVisibility(View.VISIBLE);
+            hirePanel.setAlpha(0.0f);
+            hirePanel.animate()
+                    .alpha(1.0f).setDuration(2000);*/
+            destPanel.setVisibility(View.VISIBLE);
+            destPanel.setAlpha(0.0f);
+            destPanel.animate()
+                    .alpha(1.0f).setDuration(2000);
+        }
+        else if(view.getId()==R.id.btDistinationCancel)
+        {
+            destPanel.setVisibility(View.INVISIBLE);
+            mapUiSetting(true);
         }
     }
 
@@ -204,14 +216,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         // Keep the UI Settings state in sync with the checkboxes.
         mUiSettings = mMap.getUiSettings();
-        mUiSettings.setZoomControlsEnabled(true);
-        mUiSettings.setCompassEnabled(true);
-        mUiSettings.setMyLocationButtonEnabled(true);
-        mUiSettings.setScrollGesturesEnabled(true);
-        mUiSettings.setZoomGesturesEnabled(true);
-        mUiSettings.setTiltGesturesEnabled(true);
-        mUiSettings.setRotateGesturesEnabled(true);
-
+        mapUiSetting(true);
         locationProvider = new LocationProvider(this,mMap,editor,sharedpreferences);
         locationProvider.getMyLocaton();
 
@@ -220,9 +225,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
     /**********
-     *
      * Get New LatLong When Camera is changed
-     *
      * ********/
 
     @Override
@@ -240,10 +243,19 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
 
+    //UI settings of map
+    private void mapUiSetting(boolean flag) {
+        mUiSettings.setZoomControlsEnabled(flag);
+        mUiSettings.setCompassEnabled(flag);
+        mUiSettings.setMyLocationButtonEnabled(flag);
+        mUiSettings.setScrollGesturesEnabled(flag);
+        mUiSettings.setZoomGesturesEnabled(flag);
+        mUiSettings.setTiltGesturesEnabled(flag);
+        mUiSettings.setRotateGesturesEnabled(flag);
+    }
+
     /********
-     *
      *  Get A route Between source & destination
-     *
      * ********/
 
 
@@ -283,11 +295,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
 
     /*******
-     *
      *  Search bar Operation
-     *
      * ******/
-
 
     @Override
     public boolean onQueryTextSubmit(String location) {
@@ -443,30 +452,25 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
      * ********/
     void setMarkers(ArrayList<TaxiDetail> taxiDetails)
     {
-        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Setting marker");
         Marker marker;
-        if(markers.size()==0 || markers==null)
+        for(int i=0;i<markers.size();i++)
         {
-            Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Size "+taxiDetails.size());
-            for(int i =0;i<taxiDetails.size();i++)
-            {
-                Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Driver name "+taxiDetails.get(i).getDriverName());
-                LatLng latlng=new LatLng(taxiDetails.get(i).getLatitude(),taxiDetails.get(i).getLongitude());
-                marker = mMap.addMarker(new MarkerOptions().position(latlng).title(taxiDetails.get(i).getDriverName()).flat(true));
-                //markers.add(marker);
-            }
-            //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            marker=markers.get(i);
+            marker.remove();
+            markers.remove(i);
         }
-        else
+
+
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Setting marker");
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Size "+taxiDetails.size());
+        for(int i =0;i<taxiDetails.size();i++)
         {
-            Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Size "+markers.size());
-            /*for(int i =0;i<taxiDetails.size();i++)
-            {
-                LatLng latlng=new LatLng(taxiDetails.get(i).getLatitude(),taxiDetails.get(i).getLongitude());
-                marker = mMap.addMarker(new MarkerOptions().position(latlng).title(taxiDetails.get(i).getDriverName()).flat(true));
-                markers.add(marker);
-            }*/
+            Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Driver name "+taxiDetails.get(i).getDriverName());
+            LatLng latlng=new LatLng(taxiDetails.get(i).getLatitude(),taxiDetails.get(i).getLongitude());
+            marker = mMap.addMarker(new MarkerOptions().position(latlng).title(taxiDetails.get(i).getDriverName()).flat(true));
+            markers.add(marker);
         }
+        //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
     }
 
 
@@ -475,7 +479,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
      * Starting Alarm Manager
      *
      * ******/
-
     private void startAlarmManager() {
         Log.i(LOG_TAG_TAXIPOSITIONSERVICE, "startAlarmManager");
 
@@ -486,10 +489,9 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime(),
-                10000, // 10 sec
+                1000*60, // 1 min
                 pendingIntent);
     }
-
 
     /*******
      *

@@ -24,7 +24,7 @@ public class TaxiDetailReceiver extends BroadcastReceiver {
     protected  void startTaxiDetailService(Context context)
     {
         Intent intent = new Intent(context, TaxiLocation.class);
-        Toast.makeText(context,"Start Loc service ",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context,"Start Loc service ",Toast.LENGTH_SHORT).show();
         context.startService(intent);
     }
 }
