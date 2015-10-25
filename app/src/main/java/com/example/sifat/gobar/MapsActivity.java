@@ -3,10 +3,8 @@ package com.example.sifat.gobar;
 import com.example.sifat.Controller.HttpConnection;
 import com.example.sifat.Custom.CustomMapFragmment;
 import com.example.sifat.Domain.TaxiDetail;
-import com.example.sifat.Parser.PlaceJSONParser;
 import com.example.sifat.Receiver.TaxiDetailReceiver;
 import com.example.sifat.Services.AddressFetcher;
-import com.example.sifat.Services.TaxiLocation;
 import com.example.sifat.Utilities.CustomAutoCompleteTextView;
 import com.example.sifat.Utilities.LocationProvider;
 import com.github.polok.routedrawer.RouteApi;
@@ -15,21 +13,9 @@ import com.github.polok.routedrawer.RouteRest;
 import com.github.polok.routedrawer.model.Routes;
 import com.github.polok.routedrawer.model.TravelMode;
 import com.github.polok.routedrawer.parser.RouteJsonParser;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -37,54 +23,38 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.os.SystemClock;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -222,13 +192,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     public void onCameraChange(CameraPosition cameraPosition) {
 
         Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Camera Changed");
+        boolean flag = sharedpreferences.getBoolean("flag", true);
+        boolean initMarker = sharedpreferences.getBoolean("init", true);
+        if (!flag && initMarker)
+            locationProvider.finish();
+        searchLatLng = cameraPosition.target;
         if(!distSelected)
         {
-            boolean flag=sharedpreferences.getBoolean("flag",true);
-            boolean initMarker= sharedpreferences.getBoolean("init", true);
-            if(!flag && initMarker)
-                locationProvider.finish();
-            searchLatLng = cameraPosition.target;
             if (!gettingDist)
                 srcLatLng = searchLatLng;
             else
