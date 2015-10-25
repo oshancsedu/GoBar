@@ -4,5 +4,72 @@
     <string name="app_name">GoBar</string>
     <string name="title_activity_maps">Map</string>
     <string name="sharedPref">gobar.SharedPref</string>
+    <string name="dataParse">{
+   \"predictions\" : [
+      {
+         \"description\" : \"Rahman Cricket Ground, Dhaka, Dhaka Division, Bangladesh\",
+         \"id\" : \"31b05275d87cfffd95b79a11100ca8866404a877\",
+         \"matched_substrings\" : [
+            {
+               \"length\" : 9,
+               \"offset\" : 0
+            }
+         ],
+         \"place_id\" : \"ChIJOUWvI7K4VTcRaJqOuWECH28\",
+         \"reference\" : \"CmRTAAAAn6z7-MpGieZS51vU37dVVdE_MLkgAzIyCXpuIMK0Yd3EUKZuKxCoW52wRO_bZ74thZswiQB99EOYQaiI5mtQfwgwMxwrMU2uwkEFQI6HGYen8qmOvhY-_qoysAv2lwbmEhAwo74AA-Vz59bISniZKpyhGhQRNjrwiGvdSl5lICwYzv518B3IWQ\",
+         \"terms\" : [
+            {
+               \"offset\" : 0,
+               \"value\" : \"Kalabagan Cricket Ground\"
+            },
+            {
+               \"offset\" : 26,
+               \"value\" : \"Dhaka\"
+            },
+            {
+               \"offset\" : 33,
+               \"value\" : \"Dhaka Division\"
+            },
+            {
+               \"offset\" : 49,
+               \"value\" : \"Bangladesh\"
+            }
+         ],
+         \"types\" : [ \"geocode\" ]
+      },
+      {
+         \"description\" : \"Kalabagan 1st Lane, Dhaka, Dhaka Division, Bangladesh\",
+         \"id\" : \"084664876b11cbd7a1606a38e5e4bceb41deacc5\",
+         \"matched_substrings\" : [
+            {
+               \"length\" : 9,
+               \"offset\" : 0
+            }
+         ],
+         \"place_id\" : \"EjVLYWxhYmFnYW4gMXN0IExhbmUsIERoYWthLCBEaGFrYSBEaXZpc2lvbiwgQmFuZ2xhZGVzaA\",
+         \"reference\" : \"CkQ5AAAAp5zIaR12oLZL23UTqf2EmIqGw82N-Qq-Y7uXvhsVkaJvGnoJMCEwOANMqVRIpCNA5FtVYzp0iwZFFQQf4W_A6hIQ-QPpRX9iomk8oyQT32QgSBoUjfJxaVs4nrrbkR9G-WeP8ZYIRE4\",
+         \"terms\" : [
+            {
+               \"offset\" : 0,
+               \"value\" : \"Kalabagan 1st Lane\"
+            },
+            {
+               \"offset\" : 20,
+               \"value\" : \"Dhaka\"
+            },
+            {
+               \"offset\" : 27,
+               \"value\" : \"Dhaka Division\"
+            },
+            {
+               \"offset\" : 43,
+               \"value\" : \"Bangladesh\"
+            }
+         ],
+         \"types\" : [ \"route\", \"geocode\" ]
+      }
+   ],
+   \"status\" : \"OK\"
+}</string>
 
 </resources>

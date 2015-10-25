@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <!-- Srouce Panel -->
         <LinearLayout
             android:layout_margin="10dp"
             android:layout_width="match_parent"
@@ -53,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Pick up address"
-                    android:id="@+id/tvAddressBarHeading" />
+                    android:id="@+id/tvSrcAddressBarHeading" />
 
                 <TextView
                     android:textColor="#fff"
@@ -61,49 +62,71 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="location"
-                    android:id="@+id/tvAddrss" />
+                    android:id="@+id/tvSrcAddrss" />
             </LinearLayout>
 
             <ImageButton
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:id="@+id/ibNextAction"
-                android:src="@drawable/ic_action_next"
+                android:src="@drawable/ic_action_done"
                 android:background="#322"
                 android:layout_weight="2" />
 
         </LinearLayout>
+
+        <!-- Destination Panel -->
         <LinearLayout
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_margin="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:orientation="horizontal"
-            android:layout_below="@+id/llSourcePanel"
-            android:id="@+id/llDestinationPanel"
             android:background="#322"
-            android:weightSum="6"
-            android:padding="10dp">
+            android:weightSum="10"
+            android:padding="10dp"
+            android:id="@+id/llDistPanel">
 
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/ibBacktoSourceSection"
+                android:src="@drawable/ic_action_cancel"
+                android:background="#322"
+                android:layout_weight="2" />
 
-            <!--EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/etDestination"
-                android:layout_weight="2"/-->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="6"
+                android:orientation="vertical">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/etDestination"
-                android:layout_weight="2"/>
+                <TextView
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Destination address"
+                    android:id="@+id/tvDistAddressBarHeading" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Cancel"
-                android:layout_weight="4"
-                android:id="@+id/btDistinationCancel" />
+                <TextView
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="location"
+                    android:id="@+id/tvDistAddrss" />
+            </LinearLayout>
+
+            <ImageButton
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/ibDriverSelectionAction"
+                android:src="@drawable/ic_action_next"
+                android:background="#322"
+                android:layout_weight="2" />
 
         </LinearLayout>
 
@@ -144,8 +167,6 @@
                     android:id="@+id/btHire" />
 
             </LinearLayout>
-
-
         </LinearLayout>
 
     </RelativeLayout>

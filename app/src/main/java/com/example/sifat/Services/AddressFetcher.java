@@ -33,7 +33,7 @@ public class AddressFetcher extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Log.i("Service","Handle");
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Handle");
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         LatLng latLng = intent.getParcelableExtra(LATLNG_DATA_EXTRA);
         mReceiver = intent.getParcelableExtra(ADDRESS_RECIEVER);

@@ -1,9 +1,12 @@
 package com.example.sifat.gobar;
 
+import com.example.sifat.Controller.HttpConnection;
 import com.example.sifat.Domain.TaxiDetail;
+import com.example.sifat.Parser.PlaceJSONParser;
 import com.example.sifat.Receiver.TaxiDetailReceiver;
 import com.example.sifat.Services.AddressFetcher;
 import com.example.sifat.Services.TaxiLocation;
+import com.example.sifat.Utilities.CustomAutoCompleteTextView;
 import com.example.sifat.Utilities.LocationProvider;
 import com.github.polok.routedrawer.RouteApi;
 import com.github.polok.routedrawer.RouteDrawer;
@@ -23,6 +26,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -56,19 +60,30 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,13 +101,14 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
 public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback,
         View.OnClickListener,RouteApi,
         SearchView.OnQueryTextListener,
-        GoogleMap.OnCameraChangeListener {
+        GoogleMap.OnCameraChangeListener,
+        GoogleMap.OnMarkerClickListener,
+        View.OnTouchListener{
 
     private GoogleMap mMap;
     private UiSettings mUiSettings;
-    private TextView tvAddress;
-    private ImageButton btBacktoMyPosition,btNextAction;
-    private Button btDestCancel;
+    private TextView tvSrcAddress,tvDistAddress;
+    private ImageButton btBacktoMyPosition,btNextAction,btDestCancel,btHireAction,btDriverSelectionAction;
     private Geocoder geocoder;
     List<Address> addressList;
     private Toolbar toolbar;
@@ -111,13 +127,19 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private SharedPreferences.Editor editor;
     private AddressResultReceiver mAddressResultReceiver;
     private TaxiDetailResultReceiver taxiDetailResultReceiver;
-    private boolean taxiDetailReceiverResgistered;
+    private boolean taxiDetailReceiverResgistered,gettingDist,distSelected;
     private ArrayList<TaxiDetail> taxiDetails= new ArrayList<>();
     private ArrayList<Marker> markers=new ArrayList<>();
     private AlarmManager alarmManager;
     private Intent taxiDetailIntent;
     private PendingIntent pendingIntent;
-    private LinearLayout hirePanel,destPanel;
+    private LinearLayout hirePanel,destPanel,srcPanel;
+    private CustomAutoCompleteTextView customAutoCompleteTextView;
+    private HttpConnection httpConnection;
+    private LatLng srcLatLng,distLatLng;
+    private Marker srcMarker,distMarker;
+    private RelativeLayout mapPanel;
+
 
 
     @Override
@@ -145,27 +167,37 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
     private void init() {
+        httpConnection=new HttpConnection();
         sharedpreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), Context.MODE_PRIVATE);
         editor=sharedpreferences.edit();
-        editor.putBoolean("flag",true);
-        editor.putBoolean("init",false);
+        editor.putBoolean("flag", true);
+        editor.putBoolean("init", false);
         editor.commit();
+
+        distSelected=gettingDist=false;
+
         toolbar= (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         minAccuracy = 5.0f;
-        tvAddress= (TextView) findViewById(R.id.tvAddrss);
+        tvSrcAddress= (TextView) findViewById(R.id.tvSrcAddrss);
+        tvDistAddress=(TextView) findViewById(R.id.tvDistAddrss);
 
         hirePanel= (LinearLayout) findViewById(R.id.llHirePanel);
         hirePanel.setVisibility(View.INVISIBLE);
-        destPanel= (LinearLayout) findViewById(R.id.llDestinationPanel);
+        destPanel= (LinearLayout) findViewById(R.id.llDistPanel);
         destPanel.setVisibility(View.INVISIBLE);
+        srcPanel= (LinearLayout) findViewById(R.id.llSourcePanel);
+        //mapPanel= (RelativeLayout) findViewById(R.id.mapPanel);
+        //srcPanel.setOnTouchListener(this);
 
         btBacktoMyPosition= (ImageButton) findViewById(R.id.ibMyLocation);
         btBacktoMyPosition.setOnClickListener(this);
         btNextAction= (ImageButton) findViewById(R.id.ibNextAction);
         btNextAction.setOnClickListener(this);
-        btDestCancel= (Button) findViewById(R.id.btDistinationCancel);
+        btDestCancel= (ImageButton) findViewById(R.id.ibBacktoSourceSection);
         btDestCancel.setOnClickListener(this);
+        btDriverSelectionAction= (ImageButton) findViewById(R.id.ibDriverSelectionAction);
+        btDriverSelectionAction.setOnClickListener(this);
 
         //initializing My Custom receivers
         mAddressResultReceiver= new AddressResultReceiver(new Handler());
@@ -173,29 +205,21 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         //Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"inti receiver");
     }
 
-    @Override
-    public void onClick(View view) {
-        if(view.getId()== R.id.ibMyLocation)
-        {
-            locationProvider.getMyLocaton();
-        }
-        else if(view.getId()==R.id.ibNextAction)
-        {
-            mapUiSetting(false);
-            /*hirePanel.setVisibility(View.VISIBLE);
-            hirePanel.setAlpha(0.0f);
-            hirePanel.animate()
-                    .alpha(1.0f).setDuration(2000);*/
-            destPanel.setVisibility(View.VISIBLE);
-            destPanel.setAlpha(0.0f);
-            destPanel.animate()
-                    .alpha(1.0f).setDuration(2000);
-        }
-        else if(view.getId()==R.id.btDistinationCancel)
-        {
-            destPanel.setVisibility(View.INVISIBLE);
-            mapUiSetting(true);
-        }
+    private void sourceMarked() {
+        srcMarker = mMap.addMarker(new MarkerOptions()
+                .position(srcLatLng)
+                .title("Starting Point")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.srcmarker)));
+        distLatLng=srcLatLng;
+        gettingDist=true;
+        srcPanel.animate().translationY(srcPanel.getHeight()+10.0f);
+        //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams();
+
+        destPanel.setVisibility(View.VISIBLE);
+        destPanel.setAlpha(0.0f);
+        destPanel.animate()
+                .alpha(1.0f).setDuration(1000);
+        btNextAction.setEnabled(false);
     }
 
     @Override
@@ -213,7 +237,10 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         mMap.setOnCameraChangeListener(this);
         mMap.setMyLocationEnabled(true);
         mMap.setBuildingsEnabled(true);
+        mMap.setOnMarkerClickListener(this);
 
+        //MapView mapView = (MapView) findViewById(R.id.map);
+        //mapView.setOnDragListener(this);
         // Keep the UI Settings state in sync with the checkboxes.
         mUiSettings = mMap.getUiSettings();
         mapUiSetting(true);
@@ -231,16 +258,101 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
 
-        boolean flag=sharedpreferences.getBoolean("flag",true);
-        boolean initMarker= sharedpreferences.getBoolean("init", true);
-        if(!flag && initMarker)
-        locationProvider.finish();
-        LatLng newLatLng= cameraPosition.target;
-        //new LocationAsynctask().execute(newLatLng);
-        startLocationIntentService(newLatLng);
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Camera Changed");
+        if(!distSelected)
+        {
+            srcPanel.animate().translationY(-1.0f * srcPanel.getWidth()).setDuration(1000);
+            if(gettingDist)
+                destPanel.animate().translationY(-1.0f * destPanel.getWidth()).setDuration(1000);
+
+            boolean flag=sharedpreferences.getBoolean("flag",true);
+            boolean initMarker= sharedpreferences.getBoolean("init", true);
+            if(!flag && initMarker)
+                locationProvider.finish();
+            LatLng newLatLng= cameraPosition.target;
+            if (!gettingDist)
+                srcLatLng=newLatLng;
+            else
+                distLatLng=newLatLng;
+            //new LocationAsynctask().execute(newLatLng);
+            startLocationIntentService(newLatLng);
+
+        }
         //Toast.makeText(this,getMyLocationAddress(newLatLng),Toast.LENGTH_SHORT).show();
 
     }
+
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId()== R.id.ibMyLocation)
+        {
+            locationProvider.getMyLocaton();
+        }
+        else if(view.getId()==R.id.ibNextAction)
+        {
+            sourceMarked();
+        }
+        else if(view.getId()==R.id.ibBacktoSourceSection)
+        {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(srcLatLng));
+            srcMarker.remove();
+            srcPanel.animate().translationY(0.0f);
+            destPanel.setVisibility(View.INVISIBLE);
+            tvDistAddress.setText("Select an address");
+            gettingDist=false;
+            if(distSelected)
+            {
+                distMarker.remove();
+                distSelected=false;
+            }
+            btNextAction.setEnabled(true);
+        }
+
+        else if(view.getId()==R.id.ibDriverSelectionAction)
+        {
+            if(!distSelected)
+            {
+                if(srcLatLng!=distLatLng)
+                {
+                    distSelected=true;
+                    distMarker = mMap.addMarker(new MarkerOptions()
+                            .position(distLatLng)
+                            .title("Destination Point")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.distmarker)));
+                    getRoute();
+                }
+                else
+                    Toast.makeText(this,"Choose a different location",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Toast.makeText(this,"Marker Clicked "+marker.getTitle(),Toast.LENGTH_SHORT).show();
+        marker.showInfoWindow();
+        return true;
+    }
+
+
+    /*@Override
+    public boolean onDrag(View view, DragEvent dragEvent) {
+
+        int action = dragEvent.getAction();
+        switch (action)
+        {
+            case DragEvent.ACTION_DRAG_STARTED:
+                Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Drag Started");
+                break;
+
+            case DragEvent.ACTION_DRAG_ENDED:
+                Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Drag Ended");
+                break;
+        }
+        return false;
+    }*/
 
 
     //UI settings of map
@@ -264,12 +376,12 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         final RouteDrawer routeDrawer = new RouteDrawer.RouteDrawerBuilder(mMap)
                 .withColor(Color.BLUE)
                 .withWidth(5)
-                .withAlpha(0.5f)
+                .withAlpha(0.0f)
                 .withMarkerIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
                 .build();
 
         RouteRest routeRest= new RouteRest();
-        routeRest.getJsonDirections(new LatLng(50.126922, 19.015261), new LatLng(50.200206, 19.175603), TravelMode.DRIVING)
+        routeRest.getJsonDirections(srcLatLng,distLatLng, TravelMode.DRIVING)
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<String, Routes>() {
                     @Override
@@ -300,7 +412,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onQueryTextSubmit(String location) {
-        Toast.makeText(this,location,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,location,Toast.LENGTH_SHORT).show();
         if(location!=null && location!="")
         {
             geocoder = new Geocoder(this);
@@ -309,10 +421,15 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Address address = addressList.get(0);
-            LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            if(addressList.size()>0)
+            {
+                Address address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+            else
+                Toast.makeText(this, location+" not Found", Toast.LENGTH_SHORT).show();
         }
         return true;
     }
@@ -378,7 +495,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         locationProvider.finish();
-        //mGoogleApiClient.disconnect();
     }
 
     /*****
@@ -396,6 +512,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         startService(intent);
     }
 
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        Toast.makeText(this,"Touched",Toast.LENGTH_SHORT).show();
+        Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Touched");
+        return false;
+    }
+
     /*****
      *
      *  Get Resulted address from service
@@ -410,11 +533,20 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-            Log.i(LOG_TAG_SERVICE,"OnRecieve");
+            Log.i(LOG_TAG_SERVICE, "OnRecieve");
+
             // Display the address string
             // or an error message sent from the intent service.
             String address = resultData.getString(RESULT_ADDRESS_KEY);
-            tvAddress.setText(address);
+            if(!gettingDist) {
+                srcPanel.animate().translationY(0.0f).setDuration(2000);
+                tvSrcAddress.setText(address);
+            }
+            else {
+                srcPanel.animate().translationY(srcPanel.getHeight()+10.0f).setDuration(2000);
+                destPanel.animate().translationY(0.0f).setDuration(1000);
+                tvDistAddress.setText(address);
+            }
 
             // Show a toast message if an address was found.
             /*if (resultCode == SUCCESS_RESULT) {
@@ -467,7 +599,10 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         {
             Log.i(LOG_TAG_TAXIPOSITIONSERVICE,"Driver name "+taxiDetails.get(i).getDriverName());
             LatLng latlng=new LatLng(taxiDetails.get(i).getLatitude(),taxiDetails.get(i).getLongitude());
-            marker = mMap.addMarker(new MarkerOptions().position(latlng).title(taxiDetails.get(i).getDriverName()).flat(true));
+            marker = mMap.addMarker(new MarkerOptions()
+                    .position(latlng)
+                    .title(taxiDetails.get(i).getDriverName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.taximarker)));
             markers.add(marker);
         }
         //mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
