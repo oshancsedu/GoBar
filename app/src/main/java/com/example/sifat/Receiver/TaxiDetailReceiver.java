@@ -16,7 +16,7 @@ import static com.example.sifat.Utilities.CommonUtilities.TAXIDETAIL_RECIEVER;
 public class TaxiDetailReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context,"Into the Receiver",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context,"Into the Receiver",Toast.LENGTH_SHORT).show();
         startTaxiDetailService(context);
     }
 

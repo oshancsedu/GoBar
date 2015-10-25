@@ -16,31 +16,31 @@
 
         <fragment
             android:id="@+id/map"
-            android:name="com.google.android.gms.maps.MapFragment"
+            android:name="com.example.sifat.Custom.CustomMapFragmment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <!-- Srouce Panel -->
         <LinearLayout
-            android:layout_margin="10dp"
+            android:id="@+id/llSourcePanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:orientation="horizontal"
+            android:layout_margin="10dp"
             android:background="#322"
-            android:weightSum="10"
+            android:orientation="horizontal"
             android:padding="10dp"
-            android:id="@+id/llSourcePanel">
+            android:weightSum="10">
 
             <ImageButton
+                android:id="@+id/ibMyLocation"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/ibMyLocation"
-                android:src="@drawable/ic_action_locate"
+                android:layout_weight="2"
                 android:background="#322"
-                android:layout_weight="2" />
+                android:src="@drawable/ic_action_locate" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -49,53 +49,53 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:textColor="#fff"
+                    android:id="@+id/tvSrcAddressBarHeading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Pick up address"
-                    android:id="@+id/tvSrcAddressBarHeading" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#fff" />
 
                 <TextView
-                    android:textColor="#fff"
+                    android:id="@+id/tvSrcAddrss"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="location"
-                    android:id="@+id/tvSrcAddrss" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#fff" />
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/ibNextAction"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/ibNextAction"
-                android:src="@drawable/ic_action_done"
+                android:layout_weight="2"
                 android:background="#322"
-                android:layout_weight="2" />
+                android:src="@drawable/ic_action_done" />
 
         </LinearLayout>
 
         <!-- Destination Panel -->
         <LinearLayout
-            android:layout_margin="10dp"
+            android:id="@+id/llDistPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:orientation="horizontal"
+            android:layout_margin="10dp"
             android:background="#322"
-            android:weightSum="10"
+            android:orientation="horizontal"
             android:padding="10dp"
-            android:id="@+id/llDistPanel">
+            android:weightSum="10">
 
             <ImageButton
+                android:id="@+id/ibBacktoSourceSection"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/ibBacktoSourceSection"
-                android:src="@drawable/ic_action_cancel"
+                android:layout_weight="2"
                 android:background="#322"
-                android:layout_weight="2" />
+                android:src="@drawable/ic_action_cancel" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -104,49 +104,49 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:textColor="#fff"
+                    android:id="@+id/tvDistAddressBarHeading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Destination address"
-                    android:id="@+id/tvDistAddressBarHeading" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#fff" />
 
                 <TextView
-                    android:textColor="#fff"
+                    android:id="@+id/tvDistAddrss"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="location"
-                    android:id="@+id/tvDistAddrss" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#fff" />
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/ibDriverSelectionAction"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/ibDriverSelectionAction"
-                android:src="@drawable/ic_action_next"
+                android:layout_weight="2"
                 android:background="#322"
-                android:layout_weight="2" />
+                android:src="@drawable/ic_action_next" />
 
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/ivMarker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/ivMarker"
-            android:src="@drawable/myposition"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:src="@drawable/myposition" />
 
         <LinearLayout
+            android:id="@+id/llHirePanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_below="@+id/ivMarker"
             android:layout_margin="10dp"
-            android:padding="5dp"
-            android:id="@+id/llHirePanel"
-            android:background="#322">
+            android:background="#322"
+            android:orientation="vertical"
+            android:padding="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -154,17 +154,17 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
                 <Button
+                    android:id="@+id/btDisHire"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Back"
                     android:layout_weight="1"
-                    android:id="@+id/btDisHire" />
+                    android:text="Back" />
                 <Button
+                    android:id="@+id/btHire"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hire"
                     android:layout_weight="1"
-                    android:id="@+id/btHire" />
+                    android:text="Hire" />
 
             </LinearLayout>
         </LinearLayout>
