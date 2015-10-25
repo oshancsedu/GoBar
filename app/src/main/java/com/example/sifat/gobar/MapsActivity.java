@@ -241,7 +241,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         //MapView mapView = (MapView) findViewById(R.id.map);
         //mapView.setOnDragListener(this);
-        // Keep the UI Settings state in sync with the checkboxes.
+
+        //Keep the UI Settings state in sync with the checkboxes.
         mUiSettings = mMap.getUiSettings();
         mapUiSetting(true);
         locationProvider = new LocationProvider(this,mMap,editor,sharedpreferences);
