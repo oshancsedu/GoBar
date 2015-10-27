@@ -96,6 +96,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private RatingBar rbDriverRate;
     private Map<Integer, TaxiDetail> allDriverInfo = new HashMap<>();
     private TaxiDetail selectedDriverInfo;
+    private Bundle taxiHireInfoBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +124,9 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
     private void init() {
+
+        taxiHireInfoBundle = new Bundle();
+
         httpConnection = new HttpConnection();
         sharedpreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), Context.MODE_PRIVATE);
         editor = sharedpreferences.edit();
@@ -282,10 +286,19 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             taxiLoc.setLatitude(selectedDriverMarker.getPosition().latitude);
             taxiLoc.setLongitude(selectedDriverMarker.getPosition().longitude);
             float distanceInMeter = startingLoc.distanceTo(taxiLoc) / 1000;
-            Toast.makeText(this, "Processing your hire request " + distanceInMeter + " KM", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.format("Processing your hire request\nDrive is %.2f KM away", distanceInMeter), Toast.LENGTH_SHORT).show();
 
+            //HireInfo Detail Bundle
             Intent notifyIntent = new Intent(MapsActivity.this, TaxiHireConfirmationNotify.class);
-            String message = "You have hire this taxi";
+            String message = "OK";
+            taxiHireInfoBundle.putParcelable(SRC_LATLNG, srcLatLng);
+            taxiHireInfoBundle.putParcelable(DIST_LATLNG, distLatLng);
+            taxiHireInfoBundle.putString(SELECTED_DRIVER_NAME, selectedDriverInfo.getDriverName());
+            taxiHireInfoBundle.putString(SELECTED_DRIVER_MOBILE, selectedDriverInfo.getMobile());
+            taxiHireInfoBundle.putFloat(SELECTED_DRIVER_RATING, selectedDriverInfo.getRating());
+            taxiHireInfoBundle.putString(HIRE_STATUS_MESSAGE, message);
+            notifyIntent.putExtras(taxiHireInfoBundle);
+            startService(notifyIntent);
 
         }
     }
