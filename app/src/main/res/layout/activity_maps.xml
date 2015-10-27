@@ -139,34 +139,94 @@
             android:src="@drawable/myposition" />
 
         <LinearLayout
-            android:id="@+id/llHirePanel"
+            android:id="@+id/llDriverInfoPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ivMarker"
-            android:layout_margin="10dp"
-            android:background="#322"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#fff"
             android:orientation="vertical"
-            android:padding="5dp">
+            android:padding="10dp"
+            android:weightSum="4">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-                <Button
-                    android:id="@+id/btDisHire"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Back" />
-                <Button
-                    android:id="@+id/btHire"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Hire" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
+                <ImageView
+                    android:id="@+id/ivDriverImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_weight="3"
+                    android:src="@drawable/blankface" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvDriverName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_margin="5dp"
+                        android:text="Driver Name"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                    <TextView
+                        android:id="@+id/tvDriverMobileNum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_margin="5dp"
+                        android:text="Driver Number"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </LinearLayout>
             </LinearLayout>
+
+            <RatingBar
+                android:id="@+id/rbDriverRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:stepSize="0.50" />
+
+            <Button
+                android:id="@+id/btHire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hire" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llDriverSectionMessagePanel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:background="#4c67a1"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvSelectDriverMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Select Your Driver"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#fff" />
         </LinearLayout>
 
     </RelativeLayout>

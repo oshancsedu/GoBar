@@ -24,10 +24,10 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
 
 public class TaxiLocation extends IntentService{
 
+    public ResultReceiver resultReceiver;
     String URL,header,result;
     private HttpConnection http;
     private ArrayList<TaxiDetail> taxiDetails= new ArrayList<>();
-    public ResultReceiver resultReceiver;
 
     public TaxiLocation() {
         super("TaxiLocation");
@@ -63,10 +63,13 @@ public class TaxiLocation extends IntentService{
             for(int i=0;i<jsonLocationArray.length();i++)
             {
                 JSONObject childObject= jsonLocationArray.getJSONObject(i);
+                int driverId = childObject.getInt("driver_id");
                 String drivername=childObject.getString("driver");
+                String mobile = childObject.getString("mobile");
                 double lat= childObject.getDouble("lat");
                 double lng= childObject.getDouble("lng");
-                taxiDetail= new TaxiDetail(drivername,lat,lng);
+                float rating = (float) childObject.getDouble("rating");
+                taxiDetail = new TaxiDetail(driverId, drivername, lat, lng, rating, mobile);
                 taxiDetails.add(taxiDetail);
             }
 

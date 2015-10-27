@@ -10,15 +10,21 @@ import java.io.Serializable;
  */
 public class TaxiDetail implements Serializable{
 
-    String driverName;
+    int driverId;
+    String driverName, mobile;
     double latitude,longitude;
+    float rating;
 
     public TaxiDetail(){}
-    public TaxiDetail(String driverName,double latitude,double longitude)
+
+    public TaxiDetail(int id, String driverName, double latitude, double longitude, float rating, String mobile)
     {
+        this.driverId = id;
         this.driverName=driverName;
         this.latitude=latitude;
         this.longitude=longitude;
+        this.rating = rating;
+        this.mobile = mobile;
     }
 
     public String getDriverName()
@@ -34,5 +40,17 @@ public class TaxiDetail implements Serializable{
     public double getLongitude()
     {
         return this.longitude;
+    }
+
+    public float getRating() {
+        return this.rating;
+    }
+
+    public int getDriverId() {
+        return this.driverId;
+    }
+
+    public String getMobile() {
+        return this.mobile;
     }
 }
