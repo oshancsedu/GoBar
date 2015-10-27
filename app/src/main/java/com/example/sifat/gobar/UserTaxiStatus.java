@@ -2,12 +2,15 @@ package com.example.sifat.gobar;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.sifat.Custom.CustomMapFragmment;
+import com.example.sifat.Dialogues.DriverRating;
 import com.github.polok.routedrawer.RouteApi;
 import com.github.polok.routedrawer.RouteDrawer;
 import com.github.polok.routedrawer.RouteRest;
@@ -37,7 +40,9 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
  */
 public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
         CustomMapFragmment.OnTouchListener,
-        OnMapReadyCallback {
+        OnMapReadyCallback,
+        DriverRating.Communicator,
+        View.OnClickListener {
 
     private GoogleMap gMap;
     private UiSettings uiSettings;
@@ -49,6 +54,10 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
     private RatingBar rbDriverRate;
     private float rating;
     private Toolbar toolbar;
+    private int driverId;
+    private DriverRating driverRating;
+    private String driverName;
+    private FloatingActionButton fbReleaseTaxi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +68,11 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
         srcLatLng = bundle.getParcelable(SRC_LATLNG);
         distLatLng = bundle.getParcelable(DIST_LATLNG);
 
-        tvDrivername.setText(bundle.getString(SELECTED_DRIVER_NAME));
+        driverName = bundle.getString(SELECTED_DRIVER_NAME);
+        tvDrivername.setText(driverName);
         tvDriverMobile.setText(bundle.getString(SELECTED_DRIVER_MOBILE));
         rating = bundle.getFloat(SELECTED_DRIVER_RATING);
+        driverId = bundle.getInt(SELECTED_DRIVER_ID);
         rbDriverRate.setRating(rating + 0.5f);
         rbDriverRate.setRating(rating);
 
@@ -77,6 +88,10 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
         tvDriverMobile = (TextView) findViewById(R.id.tvDriverMobileNum);
         tvDrivername = (TextView) findViewById(R.id.tvDriverName);
         rbDriverRate = (RatingBar) findViewById(R.id.rbDriverRate);
+        driverRating = new DriverRating();
+        driverRating = driverRating.newInstence(driverName);
+        fbReleaseTaxi = (FloatingActionButton) findViewById(R.id.fbReleaseTaxi);
+        fbReleaseTaxi.setOnClickListener(this);
     }
 
 
@@ -168,5 +183,16 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
     @Override
     public Observable<String> getJsonDirections(LatLng latLng, LatLng latLng1, TravelMode travelMode) {
         return null;
+    }
+
+    @Override
+    public void RatingDialog() {
+
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        driverRating.show(getFragmentManager(), "Rate the Driver");
     }
 }

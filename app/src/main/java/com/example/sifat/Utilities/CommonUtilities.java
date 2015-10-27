@@ -23,5 +23,5 @@ public class CommonUtilities {
     public static final String SELECTED_DRIVER_NAME = "selectedDriverName";
     public static final String SELECTED_DRIVER_MOBILE = "selectedDriverMobile";
     public static final String SELECTED_DRIVER_RATING = "selectedDriverRating";
-
+    public static final String SELECTED_DRIVER_ID = "selectedDriverId";
 }

@@ -296,6 +296,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             taxiHireInfoBundle.putString(SELECTED_DRIVER_NAME, selectedDriverInfo.getDriverName());
             taxiHireInfoBundle.putString(SELECTED_DRIVER_MOBILE, selectedDriverInfo.getMobile());
             taxiHireInfoBundle.putFloat(SELECTED_DRIVER_RATING, selectedDriverInfo.getRating());
+            taxiHireInfoBundle.putInt(SELECTED_DRIVER_ID, selectedDriverInfo.getDriverId());
             taxiHireInfoBundle.putString(HIRE_STATUS_MESSAGE, message);
             notifyIntent.putExtras(taxiHireInfoBundle);
             startService(notifyIntent);
