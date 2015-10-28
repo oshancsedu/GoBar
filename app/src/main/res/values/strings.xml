@@ -6,4 +6,5 @@
     <string name="sharedPref">gobar.SharedPref</string>
     <string name="sameSrcDistError">Choose a different location</string>
     <string name="driverSelected">Processing your hire request\nDrive is %.2f KM away</string>
+    <string name="facebookAppId">1638821646373788</string>
 </resources>
