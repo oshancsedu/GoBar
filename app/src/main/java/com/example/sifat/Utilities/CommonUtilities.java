@@ -1,5 +1,7 @@
 package com.example.sifat.Utilities;
 
+import android.app.NotificationManager;
+
 /**
  * Created by Sifat on 10/21/2015.
  */
@@ -7,6 +9,7 @@ public class CommonUtilities {
 
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
+    public static final int NOTIFICATION_ID = 1;
     public static final String RESULT_ADDRESS_KEY="getAddress";
     public static final String LATLNG_DATA_EXTRA ="getLatLng";
     public static final String ADDRESS_RECIEVER="getAddressReviever";
@@ -24,4 +27,6 @@ public class CommonUtilities {
     public static final String SELECTED_DRIVER_MOBILE = "selectedDriverMobile";
     public static final String SELECTED_DRIVER_RATING = "selectedDriverRating";
     public static final String SELECTED_DRIVER_ID = "selectedDriverId";
+    public static final String NOTIFICATION_MANAGER = "notificationManager";
+    public static final String IS_ON_HIRE = "isOnHire";
 }

@@ -5,10 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -25,15 +27,17 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class TaxiHireConfirmationNotify extends IntentService {
 
-
-    public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    private NotificationCompat.Builder builder;
+    private android.support.v4.app.NotificationCompat.Builder builder;
     private Context context;
     private LatLng srcLatLng, distLatLng;
-    private String message, status;
+    private String message, status, driverName;
+    private int driverId;
+    private float driverRate;
     private boolean isHired;
     private Bundle bundle;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     public TaxiHireConfirmationNotify() {
         super("TaxiHireConfirmationNotify");
@@ -41,10 +45,15 @@ public class TaxiHireConfirmationNotify extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedPref), Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         context = getApplicationContext();
         bundle = intent.getExtras();
         status = bundle.getString(HIRE_STATUS_MESSAGE);
+        driverName = bundle.getString(SELECTED_DRIVER_NAME);
+        driverId = bundle.getInt(SELECTED_DRIVER_ID);
+        driverRate = bundle.getFloat(SELECTED_DRIVER_RATING);
+
         if (status.equalsIgnoreCase("OK")) {
             isHired = true;
             message = "You have hired your taxi seccessfully";
@@ -61,20 +70,27 @@ public class TaxiHireConfirmationNotify extends IntentService {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, UserTaxiStatus.class);
+        //bundle.putParcelable(NOTIFICATION_MANAGER, (Parcelable) mNotificationManager);
         intent.putExtras(bundle);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        android.support.v4.app.NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
+        builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.notificationicon)
                         .setContentTitle("GoBar")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message))
                         .setContentText(message).setSound(sound).setLights(Color.CYAN, 1, 1).setVibrate(new long[]{100, 100, 100, 100, 100});
-        if (isHired)
-            mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        if (isHired) {
+
+            editor.putString(SELECTED_DRIVER_NAME, driverName);
+            editor.putInt(SELECTED_DRIVER_ID, driverId);
+            editor.putFloat(SELECTED_DRIVER_RATING, driverRate);
+            editor.putBoolean(IS_ON_HIRE, true);
+            editor.commit();
+            builder.setContentIntent(contentIntent);
+        }
+        mNotificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 }

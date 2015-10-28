@@ -261,12 +261,11 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         } else if (view.getId() == R.id.ibDriverSelectionAction) {
             //Check if the Destination has already been selected
             if (!distSelected) {
-                btHireAction.setEnabled(true);
-                driverSelectionMessagePanel.setVisibility(View.VISIBLE);
-                driverSelectionMessagePanel.animate().translationY(0.0f).setDuration(800);
-                isDriverSelectionMessageShowing = true;
-
                 if (srcLatLng != distLatLng) {
+                    btHireAction.setEnabled(true);
+                    driverSelectionMessagePanel.setVisibility(View.VISIBLE);
+                    driverSelectionMessagePanel.animate().translationY(0.0f).setDuration(800);
+                    isDriverSelectionMessageShowing = true;
                     distSelected = true;
                     distMarker = mMap.addMarker(new MarkerOptions()
                             .position(distLatLng)
@@ -275,7 +274,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                     //getRoute();
                     btDriverSelectionAction.setEnabled(false);
                 } else
-                    Toast.makeText(this, "Choose a different location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.sameSrcDistError), Toast.LENGTH_SHORT).show();
             }
         } else if (view.getId() == R.id.btHire) {
             Location startingLoc = new Location("");
@@ -286,7 +285,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             taxiLoc.setLatitude(selectedDriverMarker.getPosition().latitude);
             taxiLoc.setLongitude(selectedDriverMarker.getPosition().longitude);
             float distanceInMeter = startingLoc.distanceTo(taxiLoc) / 1000;
-            Toast.makeText(this, String.format("Processing your hire request\nDrive is %.2f KM away", distanceInMeter), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.format(getString(R.string.driverSelected), distanceInMeter), Toast.LENGTH_SHORT).show();
 
             //HireInfo Detail Bundle
             Intent notifyIntent = new Intent(MapsActivity.this, TaxiHireConfirmationNotify.class);

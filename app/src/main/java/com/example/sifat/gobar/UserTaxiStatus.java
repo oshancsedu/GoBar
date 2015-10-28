@@ -1,13 +1,21 @@
 package com.example.sifat.gobar;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sifat.Custom.CustomMapFragmment;
 import com.example.sifat.Dialogues.DriverRating;
@@ -58,6 +66,10 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
     private DriverRating driverRating;
     private String driverName;
     private FloatingActionButton fbReleaseTaxi;
+    private NotificationManager mNotificationManager;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +97,16 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
     private void inti() {
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        sharedPreferences = getSharedPreferences(getString(R.string.sharedPref), Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         tvDriverMobile = (TextView) findViewById(R.id.tvDriverMobileNum);
         tvDrivername = (TextView) findViewById(R.id.tvDriverName);
         rbDriverRate = (RatingBar) findViewById(R.id.rbDriverRate);
         driverRating = new DriverRating();
-        driverRating = driverRating.newInstence(driverName);
         fbReleaseTaxi = (FloatingActionButton) findViewById(R.id.fbReleaseTaxi);
         fbReleaseTaxi.setOnClickListener(this);
     }
@@ -187,12 +204,42 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
 
     @Override
     public void RatingDialog() {
-
+        doBkash();
     }
 
 
     @Override
     public void onClick(View view) {
         driverRating.show(getFragmentManager(), "Rate the Driver");
+    }
+
+
+    public void doBkash() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("bKash:");
+        alertDialog.setMessage("Please bKash tk 10.00 to 01xxxxxxxxx");
+        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                editor.putString(SELECTED_DRIVER_NAME, "");
+                editor.putInt(SELECTED_DRIVER_ID, -1);
+                editor.putBoolean(IS_ON_HIRE, false);
+                editor.commit();
+
+                dialog.cancel();
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:*247" + Uri.encode("#")));
+                startActivity(intent);
+                mNotificationManager.cancel(NOTIFICATION_ID);
+                finish();
+            }
+        });
+
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(UserTaxiStatus.this, "Cancel", Toast.LENGTH_SHORT).show();
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
     }
 }

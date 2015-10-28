@@ -44,7 +44,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="5dp"
-                android:text="You Rated : "
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
     </LinearLayout>

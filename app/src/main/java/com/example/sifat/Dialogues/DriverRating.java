@@ -2,7 +2,9 @@ package com.example.sifat.Dialogues;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -29,14 +31,8 @@ public class DriverRating extends DialogFragment implements View.OnClickListener
     private TextView tvDriverName, tvRating;
     private RatingBar rbDriverRate;
     private String driverName;
-
-    public static DriverRating newInstence(String name) {
-        DriverRating driverRating = new DriverRating();
-        Bundle args = new Bundle();
-        args.putString(SELECTED_DRIVER_NAME, name);
-        driverRating.setArguments(args);
-        return driverRating;
-    }
+    private SharedPreferences sharedPreferences;
+    private float rating;
 
     @Override
     public void onAttach(Activity activity) {
@@ -47,11 +43,9 @@ public class DriverRating extends DialogFragment implements View.OnClickListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        driverName = getArguments().getString(SELECTED_DRIVER_NAME);
-        //driverName="Sifat";
-        if (driverName == null)
-            driverName = "null";
-        Log.i(LOG_TAG_HIRETAXI, driverName);
+        sharedPreferences = getActivity().getSharedPreferences(getString(R.string.sharedPref), Context.MODE_PRIVATE);
+        driverName = sharedPreferences.getString(SELECTED_DRIVER_NAME, "null");
+        rating = sharedPreferences.getFloat(SELECTED_DRIVER_RATING, 0.0f);
         getDialog().setTitle("Rate Your Driver");
         View view = inflater.inflate(R.layout.rate_the_driver, null);
         intiViews(view);
@@ -64,6 +58,8 @@ public class DriverRating extends DialogFragment implements View.OnClickListener
         tvDriverName.setText(driverName);
         tvRating = (TextView) view.findViewById(R.id.tvYourRate);
         rbDriverRate = (RatingBar) view.findViewById(R.id.rbDriverRate);
+        rbDriverRate.setRating(rating + 0.5f);
+        rbDriverRate.setRating(rating);
         rbDriverRate.setOnRatingBarChangeListener(this);
         btPayment = (Button) view.findViewById(R.id.btPayment);
         btPayment.setOnClickListener(this);
