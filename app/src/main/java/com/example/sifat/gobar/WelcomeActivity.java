@@ -1,10 +1,18 @@
 package com.example.sifat.gobar;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by Sifat on 10/28/2015.
@@ -33,5 +41,6 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
             intent = new Intent(WelcomeActivity.this, MapsActivity.class);
             startActivity(intent);
         }
+        finish();
     }
 }

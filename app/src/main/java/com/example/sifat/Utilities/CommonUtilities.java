@@ -29,4 +29,7 @@ public class CommonUtilities {
     public static final String SELECTED_DRIVER_ID = "selectedDriverId";
     public static final String NOTIFICATION_MANAGER = "notificationManager";
     public static final String IS_ON_HIRE = "isOnHire";
+
+    public static final String LOG_TAG_FACEBOOK="facebook";
+
 }
