@@ -4,15 +4,6 @@
     tools:context="com.example.sifat.gobar.MapsActivity" >
 
     <item
-        android:id="@+id/Search"
-        android:alphabeticShortcut="s"
-        android:numericShortcut="1"
-        android:title="Search Bus"
-        android:icon="@drawable/ic_action_search"
-        android:orderInCategory="200"
-        app:showAsAction="ifRoom|collapseActionView" />
-
-    <item
         android:id="@+id/history"
         android:alphabeticShortcut="h"
         android:numericShortcut="3"

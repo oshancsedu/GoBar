@@ -541,6 +541,11 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             case R.id.Search:
                 break;
 
+            case R.id.Profile:
+                Intent intent = new Intent(MapsActivity.this,ProfileActivity.class);
+                startActivity(intent);
+                break;
+
             case R.id.logout:
                 Logout(this);
                 finish();
