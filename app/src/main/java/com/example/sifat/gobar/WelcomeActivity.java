@@ -1,6 +1,7 @@
 package com.example.sifat.gobar;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -14,17 +15,27 @@ import android.widget.Button;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import static com.example.sifat.Utilities.CommonUtilities.*;
 /**
  * Created by Sifat on 10/28/2015.
  */
 public class WelcomeActivity extends ActionBarActivity implements View.OnClickListener {
 
-    Intent intent;
-    Button singup, login;
-
+    private Intent intent;
+    private Button singup, login;
+    private SharedPreferences sharedPreferences;
+    private String email;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        intent = new Intent(WelcomeActivity.this, MapsActivity.class);
+        sharedPreferences = getSharedPreferences(String.valueOf(R.string.sharedPref),this.MODE_PRIVATE);
+        email=sharedPreferences.getString(USER_EMAIL,"");
+        if(!email.equalsIgnoreCase(""))
+        {
+            startActivity(intent);
+            finish();
+        }
         setContentView(R.layout.welcome);
         singup = (Button) findViewById(R.id.btSignUp);
         singup.setOnClickListener(this);
@@ -38,7 +49,6 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
             intent = new Intent(WelcomeActivity.this, LoginActivity.class);
             startActivity(intent);
         } else if (view.getId() == R.id.btSignUp) {
-            intent = new Intent(WelcomeActivity.this, MapsActivity.class);
             startActivity(intent);
         }
         finish();

@@ -1,6 +1,8 @@
 package com.example.sifat.gobar;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -18,17 +20,18 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,9 +50,12 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     private Profile profile;
     private AccessToken accessToken;
     private LoginManager loginManager;
-    private String profileName,profileID;
+    private String profileName,profileID,userEmail;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private Intent loggedInIntent;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +65,9 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     }
 
     private void init() {
+        sharedPreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), Context.MODE_PRIVATE);
+        editor= sharedPreferences.edit();
+        loggedInIntent=new Intent(LoginActivity.this,MapsActivity.class);
         loginManager=LoginManager.getInstance();
         callbackManager = CallbackManager.Factory.create();
         loginButton = (ImageButton) findViewById(R.id.btFBLogin);
@@ -66,10 +75,10 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         permission=new ArrayList<>();
         grantedPermissions=new HashSet<>();
         declinedPermissions=new HashSet<>();
-        permission.add("user_friends");
-        permission.add("user_status");
+        //permission.add("user_friends");
+        //permission.add("user_status");
         permission.add("email");
-        permission.add("user_birthday");
+        //permission.add("user_birthday");
         //loginButton.setReadPermissions(permission);
 
         accessTokenTracker = new AccessTokenTracker() {
@@ -99,12 +108,12 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
             @Override
             public void onCancel() {
-                Log.i(LOG_TAG_FACEBOOK,"Cancel");
+                Toast.makeText(LoginActivity.this, "Login has been canceled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-                Log.i(LOG_TAG_FACEBOOK,"Error");
+                Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             }
         };
         loginManager.registerCallback(callbackManager, facebookCallback);
@@ -114,10 +123,34 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         accessToken = loginResult.getAccessToken();
         Log.i(LOG_TAG_FACEBOOK,"access token: "+accessToken);
         profile = Profile.getCurrentProfile();
+        profileName=profile.getName();
+        profileID=profile.getId();
+
+
         if (profile != null) {
-            Log.i(LOG_TAG_FACEBOOK, profile.getName());
-            Log.i(LOG_TAG_FACEBOOK, profile.getLastName());
-            Log.i(LOG_TAG_FACEBOOK, profile.getId());
+            GraphRequest request= GraphRequest.newMeRequest(accessToken,new GraphRequest.GraphJSONObjectCallback(){
+                @Override
+                public void onCompleted(JSONObject object, GraphResponse response) {
+                    JSONObject json = response.getJSONObject();
+                    Log.i(LOG_TAG_FACEBOOK,response.toString());
+                    try {
+                        if(json != null){
+                            userEmail = json.getString("email");
+                            Log.i(LOG_TAG_FACEBOOK,userEmail);
+                            saveLoginInfo();
+                            startActivity(loggedInIntent);
+                            finish();
+                        }
+
+                    } catch (JSONException e) {
+                        Toast.makeText(LoginActivity.this,"Problem with login",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "email");
+            request.setParameters(parameters);
+            request.executeAsync();
         }
         else
         {
@@ -128,6 +161,13 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         }
     }
 
+    private void saveLoginInfo() {
+        editor.putString(USER_NAME,profileName);
+        editor.putString(USER_EMAIL,userEmail);
+        editor.putString(USER_ID,profileID);
+        editor.commit();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -135,25 +175,28 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
-
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
+        profileTracker.startTracking();
+        accessTokenTracker.startTracking();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
+        profileTracker.stopTracking();
+        accessTokenTracker.stopTracking();
     }
 
     @Override
     public void onClick(View v) {
-
         LoginManager.getInstance().logInWithReadPermissions(this,permission);
     }
 }

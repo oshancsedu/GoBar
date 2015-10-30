@@ -1,6 +1,12 @@
 package com.example.sifat.Utilities;
 
 import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+
+import com.example.sifat.gobar.R;
+import com.example.sifat.gobar.WelcomeActivity;
 
 /**
  * Created by Sifat on 10/21/2015.
@@ -31,5 +37,22 @@ public class CommonUtilities {
     public static final String IS_ON_HIRE = "isOnHire";
 
     public static final String LOG_TAG_FACEBOOK="facebook";
+
+    public static final String USER_NAME="userName";
+    public static final String USER_EMAIL="userEmail";
+    public static final String USER_ID="userId";
+
+    public static void Logout(Context context)
+    {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(String.valueOf(R.string.sharedPref),context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(USER_NAME,"");
+        editor.putString(USER_ID,"");
+        editor.putString(USER_EMAIL, "");
+        editor.commit();
+        Intent loginActivityIntent = new Intent(context, WelcomeActivity.class);
+        context.startActivity(loginActivityIntent);
+    }
+
 
 }

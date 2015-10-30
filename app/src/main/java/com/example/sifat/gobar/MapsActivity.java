@@ -394,41 +394,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         return false;
     }
 
-
-    /******
-     * Menu Settings
-     ****/
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
-        MenuItem item = menu.findItem(R.id.Search);
-        searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setQueryHint("Search Location");
-        searchView.setIconifiedByDefault(false);
-        searchView.setOnQueryTextListener(this);
-        searchView.setSubmitButtonEnabled(true);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        Intent p;
-        switch (item.getItemId()) {
-
-            case R.id.Search:
-                break;
-
-            case R.id.exit:
-                finish();
-                break;
-        }
-
-        return false;
-    }
-
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -549,5 +514,39 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             taxiDetails = (ArrayList<TaxiDetail>) bundle.getSerializable(RESULT_TAXIDETAIL_KEY);
             setMarkers(taxiDetails);
         }
+    }
+
+    /******
+     * Menu Settings
+     ****/
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        MenuItem item = menu.findItem(R.id.Search);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setQueryHint("Search Location");
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(this);
+        searchView.setSubmitButtonEnabled(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+        Intent p;
+        switch (item.getItemId()) {
+
+            case R.id.Search:
+                break;
+
+            case R.id.logout:
+                Logout(this);
+                finish();
+                break;
+        }
+
+        return false;
     }
 }
