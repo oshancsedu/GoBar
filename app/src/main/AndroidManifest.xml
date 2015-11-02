@@ -54,6 +54,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SignupActivity"/>
+        <activity android:name=".ValidationActivity"/>
         <activity android:name=".MapsActivity" />
         <activity android:name=".UserTaxiStatus" />
         <activity android:name=".LoginActivity" />

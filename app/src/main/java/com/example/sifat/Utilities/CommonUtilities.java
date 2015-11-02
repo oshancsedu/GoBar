@@ -38,9 +38,11 @@ public class CommonUtilities {
 
     public static final String LOG_TAG_FACEBOOK="facebook";
 
+    public static final String USER_FB_INFO="userFbInfo";
     public static final String USER_NAME="userName";
     public static final String USER_EMAIL="userEmail";
     public static final String USER_ID="userId";
+
 
     public static void Logout(Context context)
     {

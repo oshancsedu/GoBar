@@ -49,6 +49,7 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
             intent = new Intent(WelcomeActivity.this, LoginActivity.class);
             startActivity(intent);
         } else if (view.getId() == R.id.btSignUp) {
+            intent = new Intent(WelcomeActivity.this, SignupActivity.class);
             startActivity(intent);
         }
         finish();

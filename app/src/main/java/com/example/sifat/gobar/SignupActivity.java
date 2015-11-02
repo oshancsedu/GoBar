@@ -3,8 +3,12 @@ package com.example.sifat.gobar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,11 +21,16 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,9 +41,9 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
 /**
  * Created by Sifat on 10/28/2015.
  */
-public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
+public class SignupActivity extends ActionBarActivity implements View.OnClickListener {
 
-    private ImageButton loginButton;
+    private ImageButton signupButton;
     private FacebookCallback<LoginResult> facebookCallback;
     private CallbackManager callbackManager;
     private List<String> permission;
@@ -45,22 +54,20 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     private String profileName,profileID,userEmail;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
-    private Intent loggedInIntent;
     private FacebookInfoFetcher facebookInfoFetcher;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(this);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
         init();
     }
 
     private void init() {
-        loggedInIntent=new Intent(LoginActivity.this,MapsActivity.class);
         loginManager=LoginManager.getInstance();
         callbackManager = CallbackManager.Factory.create();
-        loginButton = (ImageButton) findViewById(R.id.btFBLogin);
-        loginButton.setOnClickListener(this);
+        signupButton = (ImageButton) findViewById(R.id.btFBSignup);
+        signupButton.setOnClickListener(this);
         permission=new ArrayList<>();
         grantedPermissions=new HashSet<>();
         declinedPermissions=new HashSet<>();
@@ -98,12 +105,12 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
             @Override
             public void onCancel() {
-                Toast.makeText(LoginActivity.this, "Login has been canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignupActivity.this, "Login has been canceled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-                Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignupActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             }
         };
         loginManager.registerCallback(callbackManager, facebookCallback);
@@ -116,14 +123,13 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         profileName=profile.getName();
         profileID=profile.getId();
 
-
         if (profile != null) {
             facebookInfoFetcher = new FacebookInfoFetcher();
-            facebookInfoFetcher.getFBInfo("id,email,first_name,last_name,birthday,gender,location",this,accessToken,false);
+            facebookInfoFetcher.getFBInfo("id,email,first_name,last_name,birthday,gender,location",this,accessToken,true);
         }
         else
         {
-            Toast.makeText(LoginActivity.this, "This profile is null", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, "This profile is null", Toast.LENGTH_SHORT).show();
             grantedPermissions=accessToken.getPermissions();
             declinedPermissions=accessToken.getDeclinedPermissions();
             Log.i(LOG_TAG_FACEBOOK,""+declinedPermissions.toString());
