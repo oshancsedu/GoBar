@@ -1,6 +1,7 @@
 package com.example.sifat.Domain;
 
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.io.Serializable;
 
@@ -20,9 +21,16 @@ public class FacebookInfo implements Serializable{
         this.gender=gender;
     }
 
-    public String getGender()
+    public int getGender()
     {
-        return gender;
+        if(gender.equalsIgnoreCase("male"))
+            return 1;
+        else if(gender.equalsIgnoreCase("female"))
+            return 2;
+        else if(gender.equalsIgnoreCase("others"))
+            return 3;
+        else
+            return 0;
     }
 
     public String getLastName() {
@@ -42,6 +50,13 @@ public class FacebookInfo implements Serializable{
     }
 
     public String getBday() {
-        return bday;
+        return getFormatedBday(bday);
+    }
+
+    private String getFormatedBday(String bday) {
+        String birthday;
+        String[] separated = bday.split("/");
+        birthday=separated[2]+"/"+separated[1]+"/"+separated[0];
+        return birthday;
     }
 }

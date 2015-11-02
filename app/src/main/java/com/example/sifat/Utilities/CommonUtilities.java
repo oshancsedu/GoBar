@@ -19,9 +19,6 @@ public class CommonUtilities {
     public static final String RESULT_ADDRESS_KEY="getAddress";
     public static final String LATLNG_DATA_EXTRA ="getLatLng";
     public static final String ADDRESS_RECIEVER="getAddressReviever";
-    public static final String LOG_TAG_SERVICE = "Service";
-    public static final String LOG_TAG_TAXIPOSITIONSERVICE="Taxi Position";
-    public static final String LOG_TAG_HIRETAXI = "Taxi Hire";
 
     public static final String GMAP_KEY="gmap";
     public static final String TAXIDETAIL_RECIEVER="getTaxiDetailReviever";
@@ -36,12 +33,26 @@ public class CommonUtilities {
     public static final String NOTIFICATION_MANAGER = "notificationManager";
     public static final String IS_ON_HIRE = "isOnHire";
 
+    /////LOG TAGs
     public static final String LOG_TAG_FACEBOOK="facebook";
+    public static final String LOG_TAG_SERVICE = "Service";
+    public static final String LOG_TAG_TAXIPOSITIONSERVICE="Taxi Position";
+    public static final String LOG_TAG_HIRETAXI = "Taxi Hire";
+    public static final String LOG_TAG_SIGNUP="singup";
 
     public static final String USER_FB_INFO="userFbInfo";
     public static final String USER_NAME="userName";
-    public static final String USER_EMAIL="userEmail";
+    public static final String USER_EMAIL="email";
     public static final String USER_ID="userId";
+    public static final String USER_ADDRESS="address";
+    public static final String USER_BDAY="bday";
+    public static final String USER_MOBILE_NUM="mobileNum";
+    public static final String USER_FNAME="fname";
+    public static final String USER_LNAME="lname";
+    public static final String USER_GENDER="gender";
+    public static final String USER_PASSWORD="password";
+
+    public static final String SIGN_UP_WEBSITE="http://192.168.0.101/gober/signup.php";
 
 
     public static void Logout(Context context)
