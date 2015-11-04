@@ -1,9 +1,11 @@
 package com.example.sifat.Controller;
 
 import android.content.Context;
+import android.content.Intent;
 import android.widget.Toast;
 
 import com.example.sifat.Utilities.LoopjHttpClient;
+import com.example.sifat.gobar.MapsActivity;
 import com.loopj.android.http.*;
 
 import org.apache.http.Header;
@@ -49,4 +51,46 @@ public class ServerCommunicator {
         });
 
     }
+
+    public void login(String email,String pass,String gcm_regId){
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(USER_EMAIL,email);
+        requestParams.put(USER_PASSWORD,pass);
+        requestParams.put(GCM_REGISTER_ID,gcm_regId);
+
+        final String loginWebsite = LOGIN_WEBSITE;
+        Toast.makeText(context,loginWebsite,Toast.LENGTH_SHORT).show();
+        LoopjHttpClient.get(loginWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - success", loginWebsite, requestParams, responseBody, headers, statusCode, null, context);
+                String response= new String(responseBody);
+                if(response.equalsIgnoreCase("failed"))
+                    showToast(context,"Login Failed");
+                else
+                {
+                    showToast(context,response);
+                    changeActivity(MapsActivity.class);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - failure", loginWebsite, requestParams, responseBody, headers, statusCode, error, context);
+            }
+        });
+    }
+
+    private void changeActivity(Class activityclass) {
+
+        Intent intent = new Intent(context,activityclass);
+        context.startActivity(intent);
+    }
 }
+
+
+
+
+

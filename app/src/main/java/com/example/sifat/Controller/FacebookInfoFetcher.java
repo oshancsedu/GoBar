@@ -21,12 +21,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import static com.example.sifat.Utilities.CommonUtilities.LOG_TAG_FACEBOOK;
-import static com.example.sifat.Utilities.CommonUtilities.USER_EMAIL;
-import static com.example.sifat.Utilities.CommonUtilities.USER_FB_INFO;
-import static com.example.sifat.Utilities.CommonUtilities.USER_ID;
-import static com.example.sifat.Utilities.CommonUtilities.USER_NAME;
-import static com.example.sifat.Utilities.CommonUtilities.getSharedPref;
+import static com.example.sifat.Utilities.CommonUtilities.*;
 
 /**
  * Created by sifat on 10/31/2015.
@@ -39,12 +34,15 @@ public class FacebookInfoFetcher {
     private Bundle bundle;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private ServerCommunicator serverCommunicator;
+    private String gcmRegNum;
 
     public void getFBInfo(String param, final Context context,AccessToken accessToken, final boolean isSigningup)
     {
         bundle = new Bundle();
         sharedPreferences= getSharedPref(context);
         editor = sharedPreferences.edit();
+        serverCommunicator=new ServerCommunicator(context);
 
         GraphRequest request= GraphRequest.newMeRequest(accessToken,new GraphRequest.GraphJSONObjectCallback(){
             @Override
@@ -74,8 +72,14 @@ public class FacebookInfoFetcher {
                         else
                         {
                             saveLoginInfo();
-                            intent=new Intent(context, MapsActivity.class);
-                            context.startActivity(intent);
+                            gcmRegNum=sharedPreferences.getString(GCM_REGISTER_ID,"");
+                            if(!gcmRegNum.isEmpty() && !gcmRegNum.equalsIgnoreCase(""))
+                                serverCommunicator.login(email,"",gcmRegNum);
+                            else
+                            {
+                                GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
+                                gcmRegFetcher.fetchGcmRegNumber(context);
+                            }
                         }
                     }
 
@@ -92,7 +96,7 @@ public class FacebookInfoFetcher {
     private void saveLoginInfo() {
         editor.putString(USER_NAME,firstName+" "+lastName);
         editor.putString(USER_EMAIL,email);
-        editor.putString(USER_ID, userID);
+        editor.putString(USER_FACEBOOK_ID, userID);
         editor.commit();
     }
 }

@@ -46,7 +46,7 @@ public class CommonUtilities {
     public static final String USER_FB_INFO="userFbInfo";
     public static final String USER_NAME="userName";
     public static final String USER_EMAIL="email";
-    public static final String USER_ID="userId";
+    public static final String USER_FACEBOOK_ID="userId";
     public static final String USER_ADDRESS="address";
     public static final String USER_BDAY="bday";
     public static final String USER_MOBILE_NUM="mobileNum";
@@ -56,6 +56,8 @@ public class CommonUtilities {
     public static final String USER_PASSWORD="password";
 
     public static final String SIGN_UP_WEBSITE="http://inspireitl.com/gober/signup.php";
+    public static final String LOGIN_WEBSITE="http://inspireitl.com/gober/login.php";
+
 
 
     ////GCM Registration number
@@ -70,7 +72,7 @@ public class CommonUtilities {
         SharedPreferences sharedPreferences = getSharedPref(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(USER_NAME,"");
-        editor.putString(USER_ID,"");
+        editor.putString(USER_FACEBOOK_ID,"");
         editor.putString(USER_EMAIL, "");
         editor.commit();
         Intent loginActivityIntent = new Intent(context, WelcomeActivity.class);
@@ -93,5 +95,10 @@ public class CommonUtilities {
             Toast.makeText(context, "Google play service not found", Toast.LENGTH_LONG).show();
             return false;
         }
+    }
+
+    public static void showToast(Context context,String message)
+    {
+        Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
     }
 }
