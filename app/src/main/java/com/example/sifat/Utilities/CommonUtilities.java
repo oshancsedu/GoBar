@@ -52,7 +52,7 @@ public class CommonUtilities {
     public static final String USER_GENDER="gender";
     public static final String USER_PASSWORD="password";
 
-    public static final String SIGN_UP_WEBSITE="http://192.168.0.101/gober/signup.php";
+    public static final String SIGN_UP_WEBSITE="http://inspireitl.com/gober/signup.php";
 
 
     public static void Logout(Context context)
