@@ -9,7 +9,12 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <permission
+        android:name="com.example.sifat.gobar.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but are recommended.
@@ -36,8 +41,16 @@
         <service android:name="com.example.sifat.Services.TaxiLocation" />
         <service android:name="com.example.sifat.Services.AddressFetcher"/>
         <service android:name="com.example.sifat.Services.TaxiHireConfirmationNotify" />
+        <service android:name="com.example.sifat.Services.GcmIntentService"/>
 
-        <receiver android:name="com.example.sifat.Receiver.TaxiDetailReceiver"/>
+        <receiver android:name="com.example.sifat.Receiver.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.example.gcm" />
+            </intent-filter>
+        </receiver>
+
 
         <activity
             android:name="com.facebook.FacebookActivity"

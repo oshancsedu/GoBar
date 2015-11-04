@@ -32,6 +32,7 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/gcm.jar')
     compile 'com.android.support:design:22.2.0'
     compile 'com.github.polok:RouteDrawer:94174c22b0'
     compile 'com.android.support:appcompat-v7:22.+'

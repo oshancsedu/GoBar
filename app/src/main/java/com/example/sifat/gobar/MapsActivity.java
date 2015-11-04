@@ -128,7 +128,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         taxiHireInfoBundle = new Bundle();
 
         httpConnection = new HttpConnection();
-        sharedpreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPref(this);
         editor = sharedpreferences.edit();
         editor.putBoolean("flag", true);
         editor.putBoolean("init", false);

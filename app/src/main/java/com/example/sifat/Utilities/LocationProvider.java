@@ -21,6 +21,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import static com.example.sifat.Utilities.CommonUtilities.checkPlayServices;
+
 public class LocationProvider implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
@@ -53,7 +55,7 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks,
         {
             editor.putBoolean("flag",false);
             editor.commit();
-            if (checkPlayServices()) {
+            if (checkPlayServices(context)) {
                 init();
                 buildGoogleApiClient();
                 mGoogleApiClient.connect();
@@ -169,17 +171,5 @@ public class LocationProvider implements GoogleApiClient.ConnectionCallbacks,
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Toast.makeText(context,"Failed to detect current location",Toast.LENGTH_SHORT).show();
         return;
-    }
-
-    /**
-     * Method to verify google play services on the device
-     * */
-    private boolean checkPlayServices() {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
-            return true;
-        } else {
-            Toast.makeText(context, "Google play service not found", Toast.LENGTH_LONG).show();
-            return false;
-        }
     }
 }

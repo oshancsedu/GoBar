@@ -26,6 +26,7 @@ import static com.example.sifat.Utilities.CommonUtilities.USER_EMAIL;
 import static com.example.sifat.Utilities.CommonUtilities.USER_FB_INFO;
 import static com.example.sifat.Utilities.CommonUtilities.USER_ID;
 import static com.example.sifat.Utilities.CommonUtilities.USER_NAME;
+import static com.example.sifat.Utilities.CommonUtilities.getSharedPref;
 
 /**
  * Created by sifat on 10/31/2015.
@@ -42,7 +43,7 @@ public class FacebookInfoFetcher {
     public void getFBInfo(String param, final Context context,AccessToken accessToken, final boolean isSigningup)
     {
         bundle = new Bundle();
-        sharedPreferences= context.getSharedPreferences(String.valueOf(R.string.sharedPref),context.MODE_PRIVATE);
+        sharedPreferences= getSharedPref(context);
         editor = sharedPreferences.edit();
 
         GraphRequest request= GraphRequest.newMeRequest(accessToken,new GraphRequest.GraphJSONObjectCallback(){

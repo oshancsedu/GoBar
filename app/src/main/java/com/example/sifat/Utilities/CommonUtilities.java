@@ -4,9 +4,12 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.example.sifat.gobar.R;
 import com.example.sifat.gobar.WelcomeActivity;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 /**
  * Created by Sifat on 10/21/2015.
@@ -55,9 +58,16 @@ public class CommonUtilities {
     public static final String SIGN_UP_WEBSITE="http://inspireitl.com/gober/signup.php";
 
 
+    ////GCM Registration number
+
+    public static final String PROPERTY_APP_VERSION = "appVersion";
+    public static final String SENDER_PROJECT_ID="307986532903";
+    public static final String GCM_REGISTER_ID="gcmRegID";
+    public static final String LOG_TAG_GCM="gcmloginfo";
+
     public static void Logout(Context context)
     {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(String.valueOf(R.string.sharedPref),context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPref(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(USER_NAME,"");
         editor.putString(USER_ID,"");
@@ -67,5 +77,21 @@ public class CommonUtilities {
         context.startActivity(loginActivityIntent);
     }
 
+    public static SharedPreferences getSharedPref(Context context)
+    {
+        SharedPreferences sharedPreferences= context.getSharedPreferences(String.valueOf(R.string.sharedPref), Context.MODE_PRIVATE);
+        return sharedPreferences;
+    }
 
+    /**
+     * Method to verify google play services on the device
+     * */
+    public static boolean checkPlayServices(Context context) {
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+            return true;
+        } else {
+            Toast.makeText(context, "Google play service not found", Toast.LENGTH_LONG).show();
+            return false;
+        }
+    }
 }

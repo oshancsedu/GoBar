@@ -1,6 +1,5 @@
 package com.example.sifat.gobar;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -10,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.sifat.Controller.SendingSignupInfo;
+import com.example.sifat.Controller.ServerCommunicator;
 import com.example.sifat.Domain.FacebookInfo;
 
 import java.util.ArrayList;
@@ -80,8 +79,8 @@ public class ValidationActivity extends ActionBarActivity implements View.OnClic
         mobile=etPhoneNumber.getText().toString();
         password="1234";
         gender=spGender.getSelectedItem().toString();
-        SendingSignupInfo sendingSignupInfo = new SendingSignupInfo(this);
-        sendingSignupInfo.sendSignupInfo(fname,lname,address,bday,gender,password,email,mobile);
+        ServerCommunicator serverCommunicator = new ServerCommunicator(this);
+        serverCommunicator.sendSignupInfo(fname,lname,address,bday,gender,password,email,mobile);
 
     }
 }

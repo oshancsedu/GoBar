@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.sifat.Controller.GcmRegFetcher;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -46,8 +48,10 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btLogIn) {
-            intent = new Intent(WelcomeActivity.this, LoginActivity.class);
-            startActivity(intent);
+            //intent = new Intent(WelcomeActivity.this, LoginActivity.class);
+            //startActivity(intent);
+            GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
+            gcmRegFetcher.fetchGcmRegNumber(this);
         } else if (view.getId() == R.id.btSignUp) {
             intent = new Intent(WelcomeActivity.this, SignupActivity.class);
             startActivity(intent);

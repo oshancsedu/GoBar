@@ -12,10 +12,10 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
 /**
  * Created by sifat on 11/3/2015.
  */
-public class SendingSignupInfo {
+public class ServerCommunicator {
 
     Context context;
-    public SendingSignupInfo(Context context)
+    public ServerCommunicator(Context context)
     {
         this.context=context;
     }
