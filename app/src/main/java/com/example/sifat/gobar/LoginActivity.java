@@ -65,7 +65,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         grantedPermissions=new HashSet<>();
         declinedPermissions=new HashSet<>();
         //permission.add("user_friends");
-        //permission.add("user_status");
+        permission.add("user_status");
         permission.add("email");
         permission.add("user_birthday");
         permission.add("user_location");
@@ -119,7 +119,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
         if (profile != null) {
             facebookInfoFetcher = new FacebookInfoFetcher();
-            facebookInfoFetcher.getFBInfo("id,email,first_name,last_name,birthday,gender,location",this,accessToken,false);
+            facebookInfoFetcher.getFBInfo("id,email,first_name,last_name",this,accessToken,false);
         }
         else
         {

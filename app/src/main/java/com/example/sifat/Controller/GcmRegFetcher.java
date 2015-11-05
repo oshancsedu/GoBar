@@ -19,16 +19,17 @@ public class GcmRegFetcher {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private GoogleCloudMessaging gcm;
-    private String gcmRegID;
+    private String gcmRegID,email,password;
+    private boolean isFacebook;
+    private ServerCommunicator serverCommunicator;
 
-    public void fetchGcmRegNumber(Context context)
+    public void fetchGcmRegNumber(Context context,String email,String password,boolean isFacebook)
     {
-        Log.i(LOG_TAG_GCM,"gcm fetching");
-        sharedPreferences = getSharedPref(context);
-        gcmRegID=sharedPreferences.getString(GCM_REGISTER_ID, "");
-        Log.i(LOG_TAG_GCM,gcmRegID);
-        if(gcmRegID==null || gcmRegID.equalsIgnoreCase("") || gcmRegID.isEmpty())
-            registerInBackground(context);
+        this.email=email;
+        this.password=password;
+        this.isFacebook=isFacebook;
+        registerInBackground(context);
+        serverCommunicator = new ServerCommunicator(context);
     }
 
     private void registerInBackground(final Context context) {
@@ -41,6 +42,8 @@ public class GcmRegFetcher {
                         gcm = GoogleCloudMessaging.getInstance(context);
                     }
                     gcmRegID = gcm.register(SENDER_PROJECT_ID);
+                    if(!gcmRegID.isEmpty() && !gcmRegID.equalsIgnoreCase(""))
+                        serverCommunicator.login(email,password,gcmRegID,isFacebook);
                     msg = "Device registered, registration ID=" + gcmRegID;
                     Log.i(LOG_TAG_GCM,gcmRegID);
                     storeRegistrationId(gcmRegID);

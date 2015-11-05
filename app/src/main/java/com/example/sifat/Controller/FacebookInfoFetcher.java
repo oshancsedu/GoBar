@@ -35,14 +35,17 @@ public class FacebookInfoFetcher {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private ServerCommunicator serverCommunicator;
-    private String gcmRegNum;
+    private String gcmRegNum,password;
+    private boolean isFacebook;
 
-    public void getFBInfo(String param, final Context context,AccessToken accessToken, final boolean isSigningup)
+    public void getFBInfo(final String param, final Context context,AccessToken accessToken, final boolean isSigningup)
     {
         bundle = new Bundle();
         sharedPreferences= getSharedPref(context);
         editor = sharedPreferences.edit();
         serverCommunicator=new ServerCommunicator(context);
+        isFacebook=true;
+        password="";
 
         GraphRequest request= GraphRequest.newMeRequest(accessToken,new GraphRequest.GraphJSONObjectCallback(){
             @Override
@@ -74,11 +77,11 @@ public class FacebookInfoFetcher {
                             saveLoginInfo();
                             gcmRegNum=sharedPreferences.getString(GCM_REGISTER_ID,"");
                             if(!gcmRegNum.isEmpty() && !gcmRegNum.equalsIgnoreCase(""))
-                                serverCommunicator.login(email,"",gcmRegNum);
+                                serverCommunicator.login(email,password,gcmRegNum,isFacebook);
                             else
                             {
                                 GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
-                                gcmRegFetcher.fetchGcmRegNumber(context);
+                                gcmRegFetcher.fetchGcmRegNumber(context,email,password,isFacebook);
                             }
                         }
                     }

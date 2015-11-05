@@ -58,7 +58,7 @@ public class CommonUtilities {
     public static final String SIGN_UP_WEBSITE="http://inspireitl.com/gober/signup.php";
     public static final String LOGIN_WEBSITE="http://inspireitl.com/gober/login.php";
 
-
+    public static final String LOGIN_WITH_FB="isLoginWithFacebook";
 
     ////GCM Registration number
 

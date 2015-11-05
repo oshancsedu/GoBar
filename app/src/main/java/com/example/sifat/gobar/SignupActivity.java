@@ -72,7 +72,7 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
         grantedPermissions=new HashSet<>();
         declinedPermissions=new HashSet<>();
         //permission.add("user_friends");
-        //permission.add("user_status");
+        permission.add("user_status");
         permission.add("email");
         permission.add("user_birthday");
         permission.add("user_location");

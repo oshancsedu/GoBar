@@ -31,6 +31,7 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         intent = new Intent(WelcomeActivity.this, MapsActivity.class);
+        printKeyHash();
         sharedPreferences = getSharedPreferences(String.valueOf(R.string.sharedPref),this.MODE_PRIVATE);
         email=sharedPreferences.getString(USER_EMAIL,"");
         if(!email.equalsIgnoreCase(""))
@@ -57,5 +58,25 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
             startActivity(intent);
         }
         finish();
+    }
+
+
+    /**
+     * Call this method inside onCreate once to get your hash key
+     */
+    public void printKeyHash() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo("com.example.sifat.gobar", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.e("SHA", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                //9hN8uQRyHS+GXtoYDapbZ0BB1ZM=
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -52,11 +52,15 @@ public class ServerCommunicator {
 
     }
 
-    public void login(String email,String pass,String gcm_regId){
+    public void login(String email,String pass,String gcm_regId,boolean isFacebook){
         final RequestParams requestParams = new RequestParams();
         requestParams.put(USER_EMAIL,email);
         requestParams.put(USER_PASSWORD,pass);
         requestParams.put(GCM_REGISTER_ID,gcm_regId);
+        requestParams.put(LOGIN_WITH_FB,isFacebook);
+
+
+
 
         final String loginWebsite = LOGIN_WEBSITE;
         Toast.makeText(context,loginWebsite,Toast.LENGTH_SHORT).show();
