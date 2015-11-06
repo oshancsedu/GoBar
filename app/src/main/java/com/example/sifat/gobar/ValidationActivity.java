@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -27,12 +28,18 @@ public class ValidationActivity extends ActionBarActivity implements View.OnClic
     private Bundle bundle;
     private String fname,lname,bday,address,email,mobile,password,gender;
     private FacebookInfo facebookInfo;
+    private LinearLayout llPassword, llConfirmPass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_validation);
         init();
 
+        llPassword = (LinearLayout) findViewById(R.id.llPasswordPanel);
+        llPassword.setVisibility(View.GONE);
+        llConfirmPass = (LinearLayout) findViewById(R.id.llConfirmPasswordPanel);
+        llConfirmPass.setVisibility(View.GONE);
         etFirstName.setText(facebookInfo.getFirstName());
         etLastName.setText(facebookInfo.getLastName());
         etEmail.setText(facebookInfo.getEmail());
@@ -77,10 +84,9 @@ public class ValidationActivity extends ActionBarActivity implements View.OnClic
         address=etAddress.getText().toString();
         email=etEmail.getText().toString();
         mobile=etPhoneNumber.getText().toString();
-        password="1234";
+        password = "";
         gender=spGender.getSelectedItem().toString();
         ServerCommunicator serverCommunicator = new ServerCommunicator(this);
         serverCommunicator.sendSignupInfo(fname,lname,address,bday,gender,password,email,mobile);
-
     }
 }

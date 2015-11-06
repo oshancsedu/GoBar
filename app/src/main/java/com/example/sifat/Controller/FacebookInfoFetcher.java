@@ -38,15 +38,14 @@ public class FacebookInfoFetcher {
     private String gcmRegNum,password;
     private boolean isFacebook;
 
-    public void getFBInfo(final String param, final Context context,AccessToken accessToken, final boolean isSigningup)
+    public void getFBInfo(String param, final Context context, AccessToken accessToken, final boolean isSigningup)
     {
+        password = "";
         bundle = new Bundle();
         sharedPreferences= getSharedPref(context);
         editor = sharedPreferences.edit();
         serverCommunicator=new ServerCommunicator(context);
         isFacebook=true;
-        password="";
-
         GraphRequest request= GraphRequest.newMeRequest(accessToken,new GraphRequest.GraphJSONObjectCallback(){
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
@@ -97,8 +96,6 @@ public class FacebookInfoFetcher {
         request.executeAsync();
     }
     private void saveLoginInfo() {
-        editor.putString(USER_NAME,firstName+" "+lastName);
-        editor.putString(USER_EMAIL,email);
         editor.putString(USER_FACEBOOK_ID, userID);
         editor.commit();
     }

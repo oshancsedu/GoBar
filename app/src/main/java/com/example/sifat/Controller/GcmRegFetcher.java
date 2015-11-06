@@ -20,16 +20,20 @@ public class GcmRegFetcher {
     private SharedPreferences.Editor editor;
     private GoogleCloudMessaging gcm;
     private String gcmRegID,email,password;
-    private boolean isFacebook;
     private ServerCommunicator serverCommunicator;
-
+    boolean isFacebook;
     public void fetchGcmRegNumber(Context context,String email,String password,boolean isFacebook)
     {
-        this.email=email;
-        this.password=password;
         this.isFacebook=isFacebook;
-        registerInBackground(context);
         serverCommunicator = new ServerCommunicator(context);
+        this.email = email;
+        this.password = password;
+        Log.i(LOG_TAG_GCM, "gcm fetching");
+        sharedPreferences = getSharedPref(context);
+        gcmRegID = sharedPreferences.getString(GCM_REGISTER_ID, "");
+        Log.i(LOG_TAG_GCM, gcmRegID);
+        if (gcmRegID == null || gcmRegID.equalsIgnoreCase("") || gcmRegID.isEmpty())
+            registerInBackground(context);
     }
 
     private void registerInBackground(final Context context) {
@@ -42,11 +46,10 @@ public class GcmRegFetcher {
                         gcm = GoogleCloudMessaging.getInstance(context);
                     }
                     gcmRegID = gcm.register(SENDER_PROJECT_ID);
-                    if(!gcmRegID.isEmpty() && !gcmRegID.equalsIgnoreCase(""))
-                        serverCommunicator.login(email,password,gcmRegID,isFacebook);
                     msg = "Device registered, registration ID=" + gcmRegID;
-                    Log.i(LOG_TAG_GCM,gcmRegID);
+                    Log.i(LOG_TAG_GCM, gcmRegID);
                     storeRegistrationId(gcmRegID);
+                    //serverCommunicator.login(email, password, gcmRegID,isFacebook);
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
                     Log.i(LOG_TAG_GCM,"Error :" + ex.getMessage());
@@ -57,6 +60,7 @@ public class GcmRegFetcher {
             @Override
             protected void onPostExecute(String msg) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                serverCommunicator.login(email, password, gcmRegID, isFacebook);
             }
         }.execute(null, null, null);
     }

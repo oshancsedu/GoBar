@@ -7,10 +7,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.sifat.Controller.FacebookInfoFetcher;
+import com.example.sifat.Controller.GcmRegFetcher;
+import com.example.sifat.Controller.ServerCommunicator;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -34,7 +38,7 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
  */
 public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
 
-    private ImageButton loginButton;
+    private ImageButton btFacebookLogin;
     private FacebookCallback<LoginResult> facebookCallback;
     private CallbackManager callbackManager;
     private List<String> permission;
@@ -46,7 +50,12 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
     private Intent loggedInIntent;
+    private Button btLogin;
+    private EditText etUsername, etPassword;
     private FacebookInfoFetcher facebookInfoFetcher;
+    private boolean isFacebook;
+    private SharedPreferences sharedPreferences;
+    private ServerCommunicator serverCommunicator;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +65,18 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     }
 
     private void init() {
+        isFacebook = false;
+        sharedPreferences = getSharedPref(this);
+        serverCommunicator = new ServerCommunicator(this);
         loggedInIntent=new Intent(LoginActivity.this,MapsActivity.class);
         loginManager=LoginManager.getInstance();
         callbackManager = CallbackManager.Factory.create();
-        loginButton = (ImageButton) findViewById(R.id.btFBLogin);
-        loginButton.setOnClickListener(this);
+        btFacebookLogin = (ImageButton) findViewById(R.id.btFBLogin);
+        btLogin = (Button) findViewById(R.id.btLogin);
+        btFacebookLogin.setOnClickListener(this);
+        btLogin.setOnClickListener(this);
+        etUsername = (EditText) findViewById(R.id.etUserEmail);
+        etPassword = (EditText) findViewById(R.id.etUserPassword);
         permission=new ArrayList<>();
         grantedPermissions=new HashSet<>();
         declinedPermissions=new HashSet<>();
@@ -158,6 +174,22 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        LoginManager.getInstance().logInWithReadPermissions(this,permission);
+        if (v.getId() == R.id.btFBLogin) {
+            LoginManager.getInstance().logInWithReadPermissions(this, permission);
+        } else if (v.getId() == R.id.btLogin) {
+            String email = etUsername.getText().toString();
+            String password = etPassword.getText().toString();
+            if (!email.equalsIgnoreCase("") && !password.equalsIgnoreCase("") && email != null && password != null) {
+                String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
+                if (!gcmRegNum.isEmpty() && !gcmRegNum.equalsIgnoreCase(""))
+                    serverCommunicator.login(email, password, gcmRegNum, isFacebook);
+                else {
+                    GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
+                    gcmRegFetcher.fetchGcmRegNumber(this, email, password, isFacebook);
+                }
+            } else {
+                showToast(this, "Please enter email and password!");
+            }
+        }
     }
 }

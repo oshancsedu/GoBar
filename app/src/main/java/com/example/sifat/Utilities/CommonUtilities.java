@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.example.sifat.Controller.ServerCommunicator;
 import com.example.sifat.gobar.R;
 import com.example.sifat.gobar.WelcomeActivity;
 import com.google.android.gms.common.ConnectionResult;
@@ -40,9 +41,11 @@ public class CommonUtilities {
     public static final String LOG_TAG_FACEBOOK="facebook";
     public static final String LOG_TAG_SERVICE = "Service";
     public static final String LOG_TAG_TAXIPOSITIONSERVICE="Taxi Position";
-    public static final String LOG_TAG_HIRETAXI = "Taxi Hire";
+    public static final String LOG_TAG_HIRETAXI = "TaxiHire";
     public static final String LOG_TAG_SIGNUP="singup";
+    public static final String LOG_TAG_GCM = "gcmloginfo";
 
+    public static final String USER_REGISTRATION_ID = "userRegID";
     public static final String USER_FB_INFO="userFbInfo";
     public static final String USER_NAME="userName";
     public static final String USER_EMAIL="email";
@@ -57,6 +60,7 @@ public class CommonUtilities {
 
     public static final String SIGN_UP_WEBSITE="http://inspireitl.com/gober/signup.php";
     public static final String LOGIN_WEBSITE="http://inspireitl.com/gober/login.php";
+    public static final String LOGOUT_WEBSITE = "http://inspireitl.com/gober/logout.php";
 
     public static final String LOGIN_WITH_FB="isLoginWithFacebook";
 
@@ -65,18 +69,17 @@ public class CommonUtilities {
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String SENDER_PROJECT_ID="307986532903";
     public static final String GCM_REGISTER_ID="gcmRegID";
-    public static final String LOG_TAG_GCM="gcmloginfo";
+
+    static ServerCommunicator serverCommunicator;
 
     public static void Logout(Context context)
     {
         SharedPreferences sharedPreferences = getSharedPref(context);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(USER_NAME,"");
-        editor.putString(USER_FACEBOOK_ID,"");
-        editor.putString(USER_EMAIL, "");
-        editor.commit();
-        Intent loginActivityIntent = new Intent(context, WelcomeActivity.class);
-        context.startActivity(loginActivityIntent);
+
+        String user_reg_num = sharedPreferences.getString(USER_REGISTRATION_ID, "");
+        String gcmID = sharedPreferences.getString(GCM_REGISTER_ID, "");
+        serverCommunicator = new ServerCommunicator(context);
+        serverCommunicator.logout(gcmID, user_reg_num);
     }
 
     public static SharedPreferences getSharedPref(Context context)

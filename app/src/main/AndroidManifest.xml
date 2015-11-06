@@ -50,6 +50,7 @@
                 <category android:name="com.example.gcm" />
             </intent-filter>
         </receiver>
+        <receiver android:name="com.example.sifat.Receiver.TaxiDetailReceiver" />
 
 
         <activity
