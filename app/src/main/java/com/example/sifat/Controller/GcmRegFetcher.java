@@ -1,6 +1,7 @@
 package com.example.sifat.Controller;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -19,21 +20,17 @@ public class GcmRegFetcher {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private GoogleCloudMessaging gcm;
-    private String gcmRegID,email,password;
-    private ServerCommunicator serverCommunicator;
-    boolean isFacebook;
-    public void fetchGcmRegNumber(Context context,String email,String password,boolean isFacebook)
+    private Intent intent;
+    private String gcmRegID;
+    //private ServerCommunicator serverCommunicator;
+
+    public void fetchGcmRegNumber(Context context, Intent intent)
     {
-        this.isFacebook=isFacebook;
-        serverCommunicator = new ServerCommunicator(context);
-        this.email = email;
-        this.password = password;
+        //serverCommunicator = new ServerCommunicator(context);
+        this.intent = intent;
         Log.i(LOG_TAG_GCM, "gcm fetching");
         sharedPreferences = getSharedPref(context);
-        gcmRegID = sharedPreferences.getString(GCM_REGISTER_ID, "");
-        Log.i(LOG_TAG_GCM, gcmRegID);
-        if (gcmRegID == null || gcmRegID.equalsIgnoreCase("") || gcmRegID.isEmpty())
-            registerInBackground(context);
+        registerInBackground(context);
     }
 
     private void registerInBackground(final Context context) {
@@ -60,7 +57,8 @@ public class GcmRegFetcher {
             @Override
             protected void onPostExecute(String msg) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                serverCommunicator.login(email, password, gcmRegID, isFacebook);
+                context.startActivity(intent);
+                //serverCommunicator.login(email, password, gcmRegID, isFacebook);
             }
         }.execute(null, null, null);
     }
@@ -70,6 +68,5 @@ public class GcmRegFetcher {
         editor=sharedPreferences.edit();
         editor.putString(GCM_REGISTER_ID,gcmRegID);
         editor.commit();
-
     }
 }

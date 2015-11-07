@@ -26,9 +26,13 @@ public class ServerCommunicator {
     public ServerCommunicator(Context context)
     {
         this.context=context;
+        setSharedPreferences();
     }
 
     public void sendSignupInfo(String fName,String lName,String address,String bday,String gender,String password,String email,String phone) {
+
+        String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
+
         final RequestParams requestParams = new RequestParams();
         requestParams.put(USER_EMAIL, email);
         requestParams.put(USER_FNAME, fName);
@@ -38,6 +42,7 @@ public class ServerCommunicator {
         requestParams.put(USER_ADDRESS, address);
         requestParams.put(USER_BDAY, bday);
         requestParams.put(USER_GENDER, gender);
+        requestParams.put(GCM_REGISTER_ID, gcmRegNum);
 
         final String signupWebsite = SIGN_UP_WEBSITE;
         Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
@@ -125,7 +130,6 @@ public class ServerCommunicator {
     }
 
     private void eraseUserInfo() {
-        setSharedPreferences();
         editor.remove(USER_EMAIL);
         editor.remove(USER_BDAY);
         editor.remove(USER_GENDER);
@@ -147,7 +151,6 @@ public class ServerCommunicator {
 
 
     private void saveUserInfo(String response) {
-        setSharedPreferences();
         try {
             JSONObject userInfo = new JSONObject(response);
             editor.putString(USER_EMAIL, userInfo.getString("email"));

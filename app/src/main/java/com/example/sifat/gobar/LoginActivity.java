@@ -181,12 +181,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
             String password = etPassword.getText().toString();
             if (!email.equalsIgnoreCase("") && !password.equalsIgnoreCase("") && email != null && password != null) {
                 String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
-                if (!gcmRegNum.isEmpty() && !gcmRegNum.equalsIgnoreCase(""))
-                    serverCommunicator.login(email, password, gcmRegNum, isFacebook);
-                else {
-                    GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
-                    gcmRegFetcher.fetchGcmRegNumber(this, email, password, isFacebook);
-                }
+                serverCommunicator.login(email, password, gcmRegNum, isFacebook);
             } else {
                 showToast(this, "Please enter email and password!");
             }
