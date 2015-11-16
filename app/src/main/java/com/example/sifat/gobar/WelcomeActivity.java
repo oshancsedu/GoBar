@@ -54,13 +54,15 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
             intent = new Intent(WelcomeActivity.this, SignupActivity.class);
         }
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
-        if (!gcmRegNum.isEmpty() && !gcmRegNum.equalsIgnoreCase("")) {
+        //showToast(this, gcmRegNum);
+        if (gcmRegNum.isEmpty() || gcmRegNum.equalsIgnoreCase("")) {
             singup.setEnabled(false);
             login.setEnabled(false);
             GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
             gcmRegFetcher.fetchGcmRegNumber(this, intent);
-        } else
+        } else {
             startActivity(intent);
+        }
         finish();
     }
 

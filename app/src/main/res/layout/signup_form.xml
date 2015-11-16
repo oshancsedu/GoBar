@@ -185,7 +185,10 @@ android:layout_height="wrap_content">
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
-        android:text="Sign up" />
+        android:background="#000"
+        android:padding="5dp"
+        android:text="Sign up"
+        android:textColor="#90EE90" />
 </LinearLayout>
 
 

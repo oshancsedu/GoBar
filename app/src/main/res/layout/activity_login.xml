@@ -16,23 +16,28 @@
 
 
         <EditText
+            android:id="@+id/etUserEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etUserEmail" />
+            android:hint="EMAIL" />
 
         <EditText
-            android:layout_marginTop="15dp"
+            android:id="@+id/etUserPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:id="@+id/etUserPassword" />
+            android:layout_marginTop="15dp"
+            android:hint="PASSWORD"
+            android:inputType="textPassword" />
 
         <Button
-            android:layout_marginTop="15dp"
+            android:id="@+id/btLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="#000"
+            android:padding="5dp"
             android:text="Login"
-            android:id="@+id/btLogin" />
+            android:textColor="#7FFFD4" />
 
     </LinearLayout>
 
@@ -45,10 +50,11 @@
             android:id="@+id/btFBLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/fblogin"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:background="#fff"
+            android:src="@drawable/facebookbutton" />
 
     </RelativeLayout>
 </LinearLayout>

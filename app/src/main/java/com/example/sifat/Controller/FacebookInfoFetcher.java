@@ -75,13 +75,8 @@ public class FacebookInfoFetcher {
                         {
                             saveLoginInfo();
                             gcmRegNum=sharedPreferences.getString(GCM_REGISTER_ID,"");
-                            if(!gcmRegNum.isEmpty() && !gcmRegNum.equalsIgnoreCase(""))
-                                serverCommunicator.login(email,password,gcmRegNum,isFacebook);
-                            else
-                            {
-                                GcmRegFetcher gcmRegFetcher = new GcmRegFetcher();
-                                gcmRegFetcher.fetchGcmRegNumber(context,email,password,isFacebook);
-                            }
+                            serverCommunicator.login(email, password, gcmRegNum, isFacebook);
+
                         }
                     }
 

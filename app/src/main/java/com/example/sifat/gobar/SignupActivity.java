@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.sifat.Controller.FacebookInfoFetcher;
+import com.example.sifat.Controller.ServerCommunicator;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -47,7 +49,7 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
  */
 public class SignupActivity extends ActionBarActivity implements View.OnClickListener {
 
-    private ImageButton signupButton;
+    private ImageButton ibSignup;
     private FacebookCallback<LoginResult> facebookCallback;
     private CallbackManager callbackManager;
     private List<String> permission;
@@ -55,13 +57,14 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
     private Profile profile;
     private AccessToken accessToken;
     private LoginManager loginManager;
-    private String profileName,profileID,userEmail;
+    private String profileName, profileID, userEmail, fname, lname, bday, address, email, mobile, password, gender, confirmPass;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
     private FacebookInfoFetcher facebookInfoFetcher;
     private EditText etFirstName, etLastName, etAddress, etPhoneNumber, etEmail, etBday, etPassword, etConfirmPass;
     private Button btSignup;
     private Spinner spGender;
+    private Toolbar toolbar;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +74,15 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
     }
 
     private void init() {
+
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+
+
         loginManager=LoginManager.getInstance();
         callbackManager = CallbackManager.Factory.create();
-        signupButton = (ImageButton) findViewById(R.id.btFBSignup);
-        signupButton.setOnClickListener(this);
+        ibSignup = (ImageButton) findViewById(R.id.btFBSignup);
+        ibSignup.setOnClickListener(this);
 
         etFirstName = (EditText) findViewById(R.id.etFirstName);
         etPassword = (EditText) findViewById(R.id.etPassword);
@@ -193,6 +201,27 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        LoginManager.getInstance().logInWithReadPermissions(this,permission);
+        if (v.getId() == R.id.btFBSignup) {
+            LoginManager.getInstance().logInWithReadPermissions(this, permission);
+        } else if (v.getId() == R.id.btSignUp) {
+            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show();
+            fname = etFirstName.getText().toString();
+            lname = etLastName.getText().toString();
+            bday = etBday.getText().toString();
+            address = etAddress.getText().toString();
+            email = etEmail.getText().toString();
+            mobile = etPhoneNumber.getText().toString();
+            password = etPassword.getText().toString();
+            confirmPass = etConfirmPass.getText().toString();
+            gender = spGender.getSelectedItem().toString();
+            ServerCommunicator serverCommunicator = new ServerCommunicator(this);
+            if (!password.equals(confirmPass))
+                showToast(this, "Password hasn't matched");
+            else if (!fname.isEmpty() && !lname.isEmpty() && !bday.isEmpty() && !address.isEmpty() && !email.isEmpty()
+                    && !mobile.isEmpty() && !password.isEmpty() && !gender.equalsIgnoreCase("-Gender-"))
+                serverCommunicator.sendSignupInfo(fname, lname, address, bday, gender, password, email, mobile);
+            else
+                showToast(this, "Fill up all the field");
+        }
     }
 }

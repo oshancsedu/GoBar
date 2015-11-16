@@ -45,7 +45,7 @@ public class ServerCommunicator {
         requestParams.put(GCM_REGISTER_ID, gcmRegNum);
 
         final String signupWebsite = SIGN_UP_WEBSITE;
-        Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
         LoopjHttpClient.get(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
 
 
@@ -71,7 +71,7 @@ public class ServerCommunicator {
         requestParams.put(LOGIN_WITH_FB,isFacebook);
 
         final String loginWebsite = LOGIN_WEBSITE;
-        Toast.makeText(context,loginWebsite,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context,loginWebsite,Toast.LENGTH_SHORT).show();
         LoopjHttpClient.get(loginWebsite, requestParams, new AsyncHttpResponseHandler() {
 
 
@@ -80,10 +80,10 @@ public class ServerCommunicator {
                 LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - success", loginWebsite, requestParams, responseBody, headers, statusCode, null, context);
                 String response= new String(responseBody);
                 if(response.equalsIgnoreCase("failed"))
-                    showToast(context,"Login Failed");
+                    showToast(context, "Login has Failed");
                 else
                 {
-                    showToast(context, response);
+                    //showToast(context, response);
                     saveUserInfo(response);
                     changeActivity(MapsActivity.class);
                 }
@@ -102,7 +102,7 @@ public class ServerCommunicator {
         requestParams.put(GCM_REGISTER_ID, gcmRegID);
 
         final String logoutWebsite = LOGOUT_WEBSITE;
-        showToast(context, logoutWebsite);
+        //showToast(context, logoutWebsite);
 
         LoopjHttpClient.get(logoutWebsite, requestParams, new AsyncHttpResponseHandler() {
 
