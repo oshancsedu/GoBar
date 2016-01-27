@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import static com.example.sifat.Utilities.CommonUtilities.*;
 
@@ -23,7 +24,7 @@ public class ProfileActivity extends ActionBarActivity{
 
     private ImageView profilePic;
     private SharedPreferences sharedPreferences;
-    private TextView tvUserName;
+    private TextView tvUserName,tvAddress,tvEmail,tvMobile,tvProfession,tvBalance;
     private Toolbar toolbar;
 
     @Override
@@ -41,10 +42,14 @@ public class ProfileActivity extends ActionBarActivity{
 
         sharedPreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), this.MODE_PRIVATE);
         profilePic= (ImageView) findViewById(R.id.ivProfilepic);
-        String profileImgUrl = "https://graph.facebook.com/968191129909623/picture?type=large";
-        Glide.with(this).load(profileImgUrl).into(profilePic);
+
+        Picasso.with(this).load(profileImgUrl).resize(200,200).centerCrop().into(profilePic);
         tvUserName=(TextView)findViewById(R.id.tvUserName);
-        tvUserName.setText(sharedPreferences.getString(USER_NAME,"Not Found"));
+        tvAddress=(TextView)findViewById(R.id.tvAddrss);
+        tvEmail=(TextView)findViewById(R.id.tvEmail);
+        tvMobile=(TextView)findViewById(R.id.tvPhone);
+        tvBalance=(TextView)findViewById(R.id.tvBalance);
+        tvProfession=(TextView)findViewById(R.id.tvProfession);
     }
 
 

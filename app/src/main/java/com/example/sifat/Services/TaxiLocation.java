@@ -39,7 +39,7 @@ public class TaxiLocation extends IntentService{
         http= new HttpConnection();
         header="taxi";
         result="";
-        URL="http://inspireitl.com/bus@hand/taxiposition.txt";
+        URL=TAXI_POSITION_ADDRESS;
     }
 
     @Override

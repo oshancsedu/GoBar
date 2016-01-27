@@ -5,13 +5,14 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!--uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /-->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <permission
         android:name="com.example.sifat.gobar.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -52,7 +53,6 @@
         </receiver>
         <receiver android:name="com.example.sifat.Receiver.TaxiDetailReceiver" />
 
-
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -60,20 +60,21 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".MapsActivity"
             android:label="@string/title_activity_maps" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".SignupActivity"/>
         <activity android:name=".ValidationActivity"/>
-        <activity android:name=".MapsActivity" />
+        <activity android:name=".WelcomeActivity" />
         <activity android:name=".UserTaxiStatus" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".ProfileActivity"/>
+        <activity android:name=".UploadNIDInfoActivity"/>
+        <activity android:name=".ImageUploadActivity"/>
     </application>
 
 </manifest>

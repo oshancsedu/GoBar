@@ -11,6 +11,7 @@ import com.example.sifat.Utilities.LocationProvider;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -32,7 +33,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.os.SystemClock;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -65,7 +70,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         SearchView.OnQueryTextListener,
         GoogleMap.OnCameraChangeListener,
         GoogleMap.OnMarkerClickListener,
-        CustomMapFragmment.OnTouchListener {
+        CustomMapFragmment.OnTouchListener, NavigationView.OnNavigationItemSelectedListener {
 
     List<Address> addressList;
     private GoogleMap mMap;
@@ -97,6 +102,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private Map<Integer, TaxiDetail> allDriverInfo = new HashMap<>();
     private TaxiDetail selectedDriverInfo;
     private Bundle taxiHireInfoBundle;
+    private DrawerLayout dlMenu;
+    private NavigationView navView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +111,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         init();
 
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         CustomMapFragmment customMapFragmment =
                 (CustomMapFragmment) getFragmentManager().findFragmentById(R.id.map);
         customMapFragmment.setListener(this);
@@ -140,6 +148,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        final ActionBar ab = getSupportActionBar();
+        ab.setHomeAsUpIndicator(R.drawable.ic_drawer);
+        ab.setDisplayHomeAsUpEnabled(true);
+        dlMenu = (DrawerLayout) findViewById(R.id.drawer);
+
+        navView = (NavigationView) findViewById(R.id.navigation);
+        navView.setNavigationItemSelectedListener(this);
 
         //inti TextViews
         tvSrcAddress = (TextView) findViewById(R.id.tvSrcAddrss);
@@ -519,10 +534,9 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     /******
      * Menu Settings
      ****/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
+        getMenuInflater().inflate(R.menu.navigation_drawer_items, menu);
         MenuItem item = menu.findItem(R.id.Search);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setQueryHint("Search Location");
@@ -535,23 +549,54 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // TODO Auto-generated method stub
-        Intent p;
+        return menuNavigation(item);
+
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        return menuNavigation(item);
+    }
+
+    private boolean menuNavigation(MenuItem item)
+    {
         switch (item.getItemId()) {
 
+            case android.R.id.home:
+                dlMenu.openDrawer(GravityCompat.START);
+                return super.onOptionsItemSelected(item);
+
             case R.id.Search:
+                showToast(this,"Search");
                 break;
 
-            case R.id.Profile:
+            case R.id.navigation_item_profile:
                 Intent intent = new Intent(MapsActivity.this,ProfileActivity.class);
                 startActivity(intent);
                 break;
 
-            case R.id.logout:
+            case R.id.navigation_item_logout:
                 Logout(this);
                 finish();
                 break;
-        }
 
+            case R.id.navigation_item_about:
+                showToast(this,"About");
+                break;
+
+            case R.id.navigation_item_help:
+                showToast(this,"Help");
+                break;
+
+            case R.id.navigation_item_history:
+                showToast(this,"History");
+                break;
+
+            case R.id.navigation_item_settings:
+                showToast(this,"Settings");
+                break;
+        }
         return false;
     }
 }

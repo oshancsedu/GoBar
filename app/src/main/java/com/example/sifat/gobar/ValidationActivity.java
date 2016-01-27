@@ -1,5 +1,6 @@
 package com.example.sifat.gobar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -16,19 +17,20 @@ import com.example.sifat.Domain.FacebookInfo;
 import java.util.ArrayList;
 
 import static com.example.sifat.Utilities.CommonUtilities.*;
+
 /**
  * Created by sifat on 10/31/2015.
  */
 public class ValidationActivity extends ActionBarActivity implements View.OnClickListener {
 
 
-    private EditText etFirstName,etLastName,etAddress,etPhoneNumber,etEmail,etBday;
+    private EditText etFirstName,etLastName,etAddress,etPhoneNumber,etEmail,etBday,etProfession;
     private Button btSignup;
     private Spinner spGender;
     private Bundle bundle;
-    private String fname,lname,bday,address,email,mobile,password,gender;
     private FacebookInfo facebookInfo;
     private LinearLayout llPassword, llConfirmPass;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,7 @@ public class ValidationActivity extends ActionBarActivity implements View.OnClic
         etEmail=(EditText)findViewById(R.id.etEmail);
         etBday=(EditText)findViewById(R.id.etBday);
         etAddress=(EditText)findViewById(R.id.etAddress);
+        etProfession= (EditText) findViewById(R.id.etProfession);
         spGender= (Spinner) findViewById(R.id.gender);
         etPhoneNumber=(EditText)findViewById(R.id.etPhoneNumber);
         btSignup= (Button)findViewById(R.id.btSignUp);
@@ -77,16 +80,24 @@ public class ValidationActivity extends ActionBarActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this,"Clicked",Toast.LENGTH_SHORT).show();
-        fname=etFirstName.getText().toString();
-        lname=etLastName.getText().toString();
-        bday=etBday.getText().toString();
-        address=etAddress.getText().toString();
-        email=etEmail.getText().toString();
-        mobile=etPhoneNumber.getText().toString();
-        password = "";
-        gender=spGender.getSelectedItem().toString();
-        ServerCommunicator serverCommunicator = new ServerCommunicator(this);
-        serverCommunicator.sendSignupInfo(fname,lname,address,bday,gender,password,email,mobile);
+        signup_fname=etFirstName.getText().toString();
+        signup_lname=etLastName.getText().toString();
+        signup_bday=etBday.getText().toString();
+        signup_address=etAddress.getText().toString();
+        signup_email=etEmail.getText().toString();
+        signup_profession = etProfession.getText().toString();
+        signup_mobile=etPhoneNumber.getText().toString();
+        signup_password = "";
+        signup_gender=spGender.getSelectedItem().toString();
+
+        if ( !signup_profession.isEmpty() && !signup_fname.isEmpty() && !signup_lname.isEmpty() &&
+                !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_email.isEmpty()
+                && !signup_mobile.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-"))
+        {
+            intent = new Intent(ValidationActivity.this,ImageUploadActivity.class);
+            startActivity(intent);
+        }
+        else
+            showToast(this, "Fill up all the field");
     }
 }

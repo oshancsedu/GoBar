@@ -3,6 +3,9 @@ package com.example.sifat.Controller;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.util.*;
+import android.util.Base64;
 import android.widget.Toast;
 
 import com.example.sifat.Utilities.LoopjHttpClient;
@@ -14,7 +17,12 @@ import com.loopj.android.http.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+
+import cz.msebera.android.httpclient.Header;
+
 import static com.example.sifat.Utilities.CommonUtilities.*;
+
 /**
  * Created by sifat on 11/3/2015.
  */
@@ -29,20 +37,69 @@ public class ServerCommunicator {
         setSharedPreferences();
     }
 
-    public void sendSignupInfo(String fName,String lName,String address,String bday,String gender,String password,String email,String phone) {
+    public void sendImage()
+    {
+        ByteArrayOutputStream proPicByteArrayOutputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream nidPicByteArrayOutputStream = new ByteArrayOutputStream();
+
+        proPic.compress(Bitmap.CompressFormat.JPEG,100,proPicByteArrayOutputStream);
+        String encodedProPicImage= android.util.Base64.encodeToString(proPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
+        NDIPic.compress(Bitmap.CompressFormat.JPEG,100,nidPicByteArrayOutputStream);
+        String encodedNidPic= android.util.Base64.encodeToString(nidPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
+
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put("image", encodedProPicImage);
+        requestParams.put("nidImage", encodedNidPic);
+
+        final String signupWebsite = "http://aimsil.com/uber/uploadImage.php";
+        LoopjHttpClient.post(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                showToast(context, new String(responseBody));
+                LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - success", signupWebsite, requestParams, responseBody, headers, statusCode, null, context);
+
+                changeActivity(WelcomeActivity.class);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
+    }
+
+    public void sendSignupInfo(){
 
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
 
+
+        ByteArrayOutputStream proPicByteArrayOutputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream nidPicByteArrayOutputStream = new ByteArrayOutputStream();
+
+        proPic.compress(Bitmap.CompressFormat.JPEG,100,proPicByteArrayOutputStream);
+        String encodedProPicImage= android.util.Base64.encodeToString(proPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
+        NDIPic.compress(Bitmap.CompressFormat.JPEG,100,nidPicByteArrayOutputStream);
+        String encodedNidPic= android.util.Base64.encodeToString(nidPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+
         final RequestParams requestParams = new RequestParams();
-        requestParams.put(USER_EMAIL, email);
-        requestParams.put(USER_FNAME, fName);
-        requestParams.put(USER_LNAME, lName);
-        requestParams.put(USER_MOBILE_NUM, phone);
-        requestParams.put(USER_PASSWORD, password);
-        requestParams.put(USER_ADDRESS, address);
-        requestParams.put(USER_BDAY, bday);
-        requestParams.put(USER_GENDER, gender);
+        requestParams.put(USER_EMAIL, signup_email);
+        requestParams.put(USER_FNAME, signup_fname);
+        requestParams.put(USER_LNAME, signup_lname);
+        requestParams.put(USER_MOBILE_NUM, signup_mobile);
+        requestParams.put(USER_PASSWORD, signup_password);
+        requestParams.put(USER_ADDRESS, signup_address);
+        requestParams.put(USER_BDAY, signup_bday);
+        requestParams.put(USER_GENDER, signup_gender);
         requestParams.put(GCM_REGISTER_ID, gcmRegNum);
+        requestParams.put(USER_N_ID, signup_NID);
+        requestParams.put(USER_PRO_PIC, encodedProPicImage);
+        requestParams.put(USER_NID_PIC, encodedNidPic);
+        requestParams.put(USER_PROFESSON, signup_profession);
 
         final String signupWebsite = SIGN_UP_WEBSITE;
         //Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
@@ -96,6 +153,7 @@ public class ServerCommunicator {
         });
     }
 
+
     public void logout(String gcmRegID, String userRegID) {
         final RequestParams requestParams = new RequestParams();
         requestParams.put(USER_REGISTRATION_ID, userRegID);
@@ -143,16 +201,15 @@ public class ServerCommunicator {
         editor.commit();
     }
 
-    private void changeActivity(Class activityclass) {
-
-        Intent intent = new Intent(context,activityclass);
-        context.startActivity(intent);
-    }
-
-
     private void saveUserInfo(String response) {
         try {
             JSONObject userInfo = new JSONObject(response);
+
+            editor.putString(USER_RATING,userInfo.getString("userRating"));
+            editor.putString(USER_BALANCE,userInfo.getString("userBalance"));
+            editor.putString(USER_PRO_PIC_URL, userInfo.getString("proPicURL"));
+            editor.putString(USER_PROFESSION,userInfo.getString("userProfession"));
+            editor.putString(USER_NID,userInfo.getString("userNID"));
             editor.putString(USER_EMAIL, userInfo.getString("email"));
             editor.putString(USER_BDAY, userInfo.getString("birthday"));
             editor.putString(USER_GENDER, userInfo.getString("gender"));
@@ -162,6 +219,7 @@ public class ServerCommunicator {
             editor.putString(USER_LNAME, userInfo.getString("last_name"));
             editor.putString(USER_NAME, userInfo.getString("first_name") + " " + userInfo.getString("last_name"));
             editor.putString(USER_REGISTRATION_ID, userInfo.getString("id"));
+
             editor.commit();
 
             showToast(context, sharedPreferences.getString(USER_ADDRESS, "") + sharedPreferences.getString(USER_EMAIL, "") +
@@ -178,5 +236,11 @@ public class ServerCommunicator {
     private void setSharedPreferences() {
         sharedPreferences = getSharedPref(context);
         editor = sharedPreferences.edit();
+    }
+
+    private void changeActivity(Class activityclass) {
+
+        Intent intent = new Intent(context,activityclass);
+        context.startActivity(intent);
     }
 }

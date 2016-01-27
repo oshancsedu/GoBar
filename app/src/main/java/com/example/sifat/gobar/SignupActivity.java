@@ -57,14 +57,15 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
     private Profile profile;
     private AccessToken accessToken;
     private LoginManager loginManager;
-    private String profileName, profileID, userEmail, fname, lname, bday, address, email, mobile, password, gender, confirmPass;
+    private String profileName, profileID, userEmail;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
     private FacebookInfoFetcher facebookInfoFetcher;
-    private EditText etFirstName, etLastName, etAddress, etPhoneNumber, etEmail, etBday, etPassword, etConfirmPass;
+    private EditText etFirstName, etLastName, etAddress, etPhoneNumber, etEmail, etBday, etPassword, etConfirmPass,etProfession;
     private Button btSignup;
     private Spinner spGender;
     private Toolbar toolbar;
+    private Intent intent;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +94,7 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
         etAddress = (EditText) findViewById(R.id.etAddress);
         spGender = (Spinner) findViewById(R.id.gender);
         etPhoneNumber = (EditText) findViewById(R.id.etPhoneNumber);
+        etProfession= (EditText) findViewById(R.id.etProfession);
         btSignup = (Button) findViewById(R.id.btSignUp);
         btSignup.setOnClickListener(this);
 
@@ -205,21 +207,27 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
             LoginManager.getInstance().logInWithReadPermissions(this, permission);
         } else if (v.getId() == R.id.btSignUp) {
             Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show();
-            fname = etFirstName.getText().toString();
-            lname = etLastName.getText().toString();
-            bday = etBday.getText().toString();
-            address = etAddress.getText().toString();
-            email = etEmail.getText().toString();
-            mobile = etPhoneNumber.getText().toString();
-            password = etPassword.getText().toString();
-            confirmPass = etConfirmPass.getText().toString();
-            gender = spGender.getSelectedItem().toString();
-            ServerCommunicator serverCommunicator = new ServerCommunicator(this);
-            if (!password.equals(confirmPass))
+            signup_fname = etFirstName.getText().toString();
+            signup_lname = etLastName.getText().toString();
+            signup_bday = etBday.getText().toString();
+            signup_address = etAddress.getText().toString();
+            signup_email = etEmail.getText().toString();
+            signup_mobile = etPhoneNumber.getText().toString();
+            signup_password = etPassword.getText().toString();
+            signup_confirmPass = etConfirmPass.getText().toString();
+            signup_profession = etProfession.getText().toString();
+            signup_gender = spGender.getSelectedItem().toString();
+
+            if (!signup_password.equals(signup_confirmPass))
                 showToast(this, "Password hasn't matched");
-            else if (!fname.isEmpty() && !lname.isEmpty() && !bday.isEmpty() && !address.isEmpty() && !email.isEmpty()
-                    && !mobile.isEmpty() && !password.isEmpty() && !gender.equalsIgnoreCase("-Gender-"))
-                serverCommunicator.sendSignupInfo(fname, lname, address, bday, gender, password, email, mobile);
+            else if ( !signup_profession.isEmpty() && !signup_fname.isEmpty() && !signup_lname.isEmpty() &&
+                    !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_email.isEmpty()
+                    && !signup_mobile.isEmpty() && !signup_password.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-"))
+            {
+                intent = new Intent(SignupActivity.this,ImageUploadActivity.class);
+                startActivity(intent);
+            }
+
             else
                 showToast(this, "Fill up all the field");
         }

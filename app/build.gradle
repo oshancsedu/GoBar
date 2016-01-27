@@ -33,13 +33,15 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile files('libs/gcm.jar')
-    compile 'com.android.support:design:22.2.0'
+    compile 'com.android.support:design:23.0.0'
     compile 'com.github.polok:RouteDrawer:94174c22b0'
-    compile 'com.android.support:appcompat-v7:22.+'
-    compile 'com.android.support:support-v4:22.2.+'
-    compile 'com.google.android.gms:play-services:8.1.0'
+    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.android.support:support-v4:23.0.+'
+    compile 'com.google.android.gms:play-services:8.3.0'
     compile 'com.loopj.android:android-async-http:1.4.+'
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.github.bumptech.glide:glide:3.6.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.johnkil.android-robototextview:robototextview:2.4.3'
 }
