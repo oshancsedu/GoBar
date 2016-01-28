@@ -49,7 +49,7 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btLogIn) {
-            intent = new Intent(WelcomeActivity.this, ProfileActivity.class);
+            intent = new Intent(WelcomeActivity.this, LoginActivity.class);
         } else if (view.getId() == R.id.btSignUp) {
             intent = new Intent(WelcomeActivity.this, SignupActivity.class);
         }

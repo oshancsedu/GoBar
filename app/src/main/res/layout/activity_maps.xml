@@ -250,7 +250,7 @@
             app:headerLayout="@layout/nvheader"
             app:itemIconTint="#333"
             app:itemTextColor="#333"
-            app:menu="@menu/navigation_drawer_items" />
+            app:menu="@menu/map_navigation_drawer_items" />
 
     </android.support.v4.widget.DrawerLayout>
 

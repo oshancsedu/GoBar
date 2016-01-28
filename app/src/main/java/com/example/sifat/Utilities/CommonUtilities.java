@@ -5,10 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.support.v4.view.GravityCompat;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.sifat.Controller.ServerCommunicator;
+import com.example.sifat.gobar.AboutActivity;
+import com.example.sifat.gobar.HelpActivity;
+import com.example.sifat.gobar.HistoryActivity;
+import com.example.sifat.gobar.ProfileActivity;
 import com.example.sifat.gobar.R;
+import com.example.sifat.gobar.SettingsActivity;
 import com.example.sifat.gobar.WelcomeActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -120,5 +127,42 @@ public class CommonUtilities {
     public static void showToast(Context context,String message)
     {
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
+    }
+
+    public static boolean menuNavigation(MenuItem item,Context context)
+    {
+        Intent intent;
+        switch (item.getItemId()) {
+
+            case R.id.Search:
+                showToast(context,"Search");
+                break;
+
+            case R.id.navigation_item_profile:
+                intent = new Intent(context,ProfileActivity.class);
+                context.startActivity(intent);
+                break;
+
+            case R.id.navigation_item_about:
+                intent = new Intent(context,AboutActivity.class);
+                context.startActivity(intent);
+                break;
+
+            case R.id.navigation_item_help:
+                intent = new Intent(context,HelpActivity.class);
+                context.startActivity(intent);
+                break;
+
+            case R.id.navigation_item_history:
+                intent = new Intent(context,HistoryActivity.class);
+                context.startActivity(intent);
+                break;
+
+            case R.id.navigation_item_settings:
+                intent = new Intent(context,SettingsActivity.class);
+                context.startActivity(intent);
+                break;
+        }
+        return false;
     }
 }

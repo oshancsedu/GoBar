@@ -11,7 +11,6 @@ import com.example.sifat.Utilities.LocationProvider;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -536,7 +535,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
      ****/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.navigation_drawer_items, menu);
+        getMenuInflater().inflate(R.menu.map_navigation_drawer_items, menu);
         MenuItem item = menu.findItem(R.id.Search);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setQueryHint("Search Location");
@@ -548,19 +547,17 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        return menuNavigation(item);
-
+        return menuNavigation(item,this);
     }
-
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        return menuNavigation(item);
+        return menuNavigation(item,this);
     }
 
-    private boolean menuNavigation(MenuItem item)
+    private boolean menuNavigation(MenuItem item,Context context)
     {
+        Intent intent;
         switch (item.getItemId()) {
 
             case android.R.id.home:
@@ -568,33 +565,48 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
 
             case R.id.Search:
-                showToast(this,"Search");
                 break;
 
             case R.id.navigation_item_profile:
-                Intent intent = new Intent(MapsActivity.this,ProfileActivity.class);
+                intent = new Intent(context,ProfileActivity.class);
+                if(dlMenu.isDrawerOpen(GravityCompat.START))
+                    dlMenu.closeDrawers();
                 startActivity(intent);
                 break;
 
             case R.id.navigation_item_logout:
                 Logout(this);
+                if(dlMenu.isDrawerOpen(GravityCompat.START))
+                    dlMenu.closeDrawers();
                 finish();
                 break;
 
             case R.id.navigation_item_about:
-                showToast(this,"About");
+                intent = new Intent(context,AboutActivity.class);
+                if(dlMenu.isDrawerOpen(GravityCompat.START))
+                    dlMenu.closeDrawers();
+                startActivity(intent);
                 break;
 
             case R.id.navigation_item_help:
-                showToast(this,"Help");
+                intent = new Intent(context,HelpActivity.class);
+                if(dlMenu.isDrawerOpen(GravityCompat.START))
+                    dlMenu.closeDrawers();
+                startActivity(intent);
                 break;
 
             case R.id.navigation_item_history:
-                showToast(this,"History");
+                intent = new Intent(context,HistoryActivity.class);
+                if(dlMenu.isDrawerOpen(GravityCompat.START))
+                    dlMenu.closeDrawers();
+                startActivity(intent);
                 break;
 
             case R.id.navigation_item_settings:
-                showToast(this,"Settings");
+                intent = new Intent(context,SettingsActivity.class);
+                if(dlMenu.isDrawerOpen(GravityCompat.START))
+                    dlMenu.closeDrawers();
+                startActivity(intent);
                 break;
         }
         return false;

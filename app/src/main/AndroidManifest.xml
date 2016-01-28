@@ -72,9 +72,33 @@
         <activity android:name=".WelcomeActivity" />
         <activity android:name=".UserTaxiStatus" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".ProfileActivity"/>
-        <activity android:name=".UploadNIDInfoActivity"/>
-        <activity android:name=".ImageUploadActivity"/>
+
+        <activity
+            android:name=".ProfileActivity"
+            android:label="Profile"/>
+
+        <activity
+            android:name=".UploadNIDInfoActivity"
+            android:label="NID Upload"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ImageUploadActivity"
+            android:label="Upload"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".AboutActivity"
+            android:label="About"/>
+        <activity
+            android:name=".HelpActivity"
+            android:label="Help"/>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings"/>
+        <activity
+            android:name=".HistoryActivity"
+            android:label="History"/>
     </application>
 
 </manifest>
