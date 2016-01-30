@@ -5,20 +5,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.sifat.Receiver.GcmBroadcastReceiver;
+import com.example.sifat.gobar.CompleteProfileActivity;
 import com.example.sifat.gobar.R;
-import com.example.sifat.gobar.SignupActivity;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import static com.example.sifat.Utilities.CommonUtilities.*;
@@ -73,7 +70,7 @@ public class GcmIntentService extends IntentService {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent intent = new Intent(this, SignupActivity.class);
+        Intent intent = new Intent(this, CompleteProfileActivity.class);
         intent.putExtra("message", msg);
 
 

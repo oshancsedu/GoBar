@@ -47,12 +47,13 @@ public class ProfileActivity extends ActionBarActivity implements NavigationView
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_drawer);
+        ab.setHomeAsUpIndicator(R.drawable.ic_action_back);
         ab.setDisplayHomeAsUpEnabled(true);
-        dlMenu = (DrawerLayout) findViewById(R.id.drawer);
 
-        navView = (NavigationView) findViewById(R.id.navigation);
-        navView.setNavigationItemSelectedListener(this);
+        //dlMenu = (DrawerLayout) findViewById(R.id.drawer);
+
+        /*navView = (NavigationView) findViewById(R.id.navigation);
+        navView.setNavigationItemSelectedListener(this);*/
 
         sharedPreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), this.MODE_PRIVATE);
         profilePic= (ImageView) findViewById(R.id.ivProfilepic);
@@ -66,6 +67,14 @@ public class ProfileActivity extends ActionBarActivity implements NavigationView
         tvProfession=(TextView)findViewById(R.id.tvProfession);
     }
 
+    /******
+     * Menu Settings
+     ****/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -83,10 +92,10 @@ public class ProfileActivity extends ActionBarActivity implements NavigationView
         switch (item.getItemId()) {
 
             case android.R.id.home:
-                dlMenu.openDrawer(GravityCompat.START);
-                return super.onOptionsItemSelected(item);
+                finish();
+                return true;
 
-            case R.id.navigation_item_map:
+            /*case R.id.navigation_item_map:
                 intent = new Intent(context,MapsActivity.class);
                 if(dlMenu.isDrawerOpen(GravityCompat.START))
                     dlMenu.closeDrawers();
@@ -133,7 +142,7 @@ public class ProfileActivity extends ActionBarActivity implements NavigationView
                 if(dlMenu.isDrawerOpen(GravityCompat.START))
                     dlMenu.closeDrawers();
                 startActivity(intent);
-                break;
+                break;*/
         }
         return false;
     }

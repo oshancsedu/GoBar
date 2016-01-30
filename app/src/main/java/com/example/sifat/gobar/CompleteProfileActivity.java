@@ -1,15 +1,9 @@
 package com.example.sifat.gobar;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -20,23 +14,17 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.sifat.Controller.FacebookInfoFetcher;
-import com.example.sifat.Controller.ServerCommunicator;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,7 +35,7 @@ import static com.example.sifat.Utilities.CommonUtilities.*;
 /**
  * Created by Sifat on 10/28/2015.
  */
-public class SignupActivity extends ActionBarActivity implements View.OnClickListener {
+public class CompleteProfileActivity extends ActionBarActivity implements View.OnClickListener {
 
     private ImageButton ibSignup;
     private FacebookCallback<LoginResult> facebookCallback;
@@ -144,12 +132,12 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
 
             @Override
             public void onCancel() {
-                Toast.makeText(SignupActivity.this, "Login has been canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CompleteProfileActivity.this, "Login has been canceled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-                Toast.makeText(SignupActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CompleteProfileActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             }
         };
         loginManager.registerCallback(callbackManager, facebookCallback);
@@ -168,7 +156,7 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
         }
         else
         {
-            Toast.makeText(SignupActivity.this, "This profile is null", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CompleteProfileActivity.this, "This profile is null", Toast.LENGTH_SHORT).show();
             grantedPermissions=accessToken.getPermissions();
             declinedPermissions=accessToken.getDeclinedPermissions();
             Log.i(LOG_TAG_FACEBOOK,""+declinedPermissions.toString());
@@ -224,7 +212,7 @@ public class SignupActivity extends ActionBarActivity implements View.OnClickLis
                     !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_email.isEmpty()
                     && !signup_mobile.isEmpty() && !signup_password.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-"))
             {
-                intent = new Intent(SignupActivity.this,ImageUploadActivity.class);
+                intent = new Intent(CompleteProfileActivity.this,ImageUploadActivity.class);
                 startActivity(intent);
             }
 

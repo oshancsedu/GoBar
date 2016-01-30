@@ -73,9 +73,7 @@ public class ServerCommunicator {
     }
 
     public void sendSignupInfo(){
-
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
-
 
         ByteArrayOutputStream proPicByteArrayOutputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream nidPicByteArrayOutputStream = new ByteArrayOutputStream();
@@ -100,9 +98,10 @@ public class ServerCommunicator {
         requestParams.put(USER_PRO_PIC, encodedProPicImage);
         requestParams.put(USER_NID_PIC, encodedNidPic);
         requestParams.put(USER_PROFESSON, signup_profession);
+        requestParams.put(USER_TYPE_STRING,USER_TYPE);
 
         final String signupWebsite = SIGN_UP_WEBSITE;
-        //Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
+        Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
         LoopjHttpClient.get(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
 
 
@@ -219,7 +218,6 @@ public class ServerCommunicator {
             editor.putString(USER_LNAME, userInfo.getString("last_name"));
             editor.putString(USER_NAME, userInfo.getString("first_name") + " " + userInfo.getString("last_name"));
             editor.putString(USER_REGISTRATION_ID, userInfo.getString("id"));
-
             editor.commit();
 
             showToast(context, sharedPreferences.getString(USER_ADDRESS, "") + sharedPreferences.getString(USER_EMAIL, "") +

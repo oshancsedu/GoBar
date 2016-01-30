@@ -35,6 +35,7 @@ public class CommonUtilities {
     public static final String RESULT_ADDRESS_KEY="getAddress";
     public static final String LATLNG_DATA_EXTRA ="getLatLng";
     public static final String ADDRESS_RECIEVER="getAddressReviever";
+    public static final String USER_TYPE="User";
 
     public static final String GMAP_KEY="gmap";
     public static final String TAXIDETAIL_RECIEVER="getTaxiDetailReviever";
@@ -79,9 +80,10 @@ public class CommonUtilities {
     public static final String USER_N_ID="nationalID";
     public static final String USER_PRO_PIC="profile_Picture";
     public static final String USER_NID_PIC="nidPic";
+    public static final String USER_TYPE_STRING="userType";
 
 
-    public static final String SIGN_UP_WEBSITE="http://inspireitl.com/gober/signup.php";
+    public static final String SIGN_UP_WEBSITE="192.168.1.111:8000/rest-auth/registration";
     public static final String LOGIN_WEBSITE="http://inspireitl.com/gober/login.php";
     public static final String LOGOUT_WEBSITE = "http://inspireitl.com/gober/logout.php";
     public static final String TAXI_POSITION_ADDRESS= "http://aimsil.com/uber/taxiposition.txt";

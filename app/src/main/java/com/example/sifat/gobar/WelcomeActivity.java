@@ -51,7 +51,7 @@ public class WelcomeActivity extends ActionBarActivity implements View.OnClickLi
         if (view.getId() == R.id.btLogIn) {
             intent = new Intent(WelcomeActivity.this, LoginActivity.class);
         } else if (view.getId() == R.id.btSignUp) {
-            intent = new Intent(WelcomeActivity.this, SignupActivity.class);
+            intent = new Intent(WelcomeActivity.this, CompleteProfileActivity.class);
         }
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
         //showToast(this, gcmRegNum);

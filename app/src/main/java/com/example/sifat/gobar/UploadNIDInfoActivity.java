@@ -64,7 +64,7 @@ public class UploadNIDInfoActivity extends ActionBarActivity implements View.OnC
             {
                 ServerCommunicator serverCommunicator = new ServerCommunicator(this);
                 NDIPic = ((BitmapDrawable) ivNid.getDrawable()).getBitmap();
-                serverCommunicator.sendImage();
+                serverCommunicator.sendSignupInfo();
             }
 
         }
