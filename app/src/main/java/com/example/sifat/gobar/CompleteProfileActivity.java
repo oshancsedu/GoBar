@@ -49,7 +49,7 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
     private FacebookInfoFetcher facebookInfoFetcher;
-    private EditText etFirstName, etLastName, etAddress, etPhoneNumber, etEmail, etBday, etPassword, etConfirmPass,etProfession;
+    private EditText etFirstName, etLastName, etAddress, etBday, etProfession;
     private Button btSignup;
     private Spinner spGender;
     private Toolbar toolbar;
@@ -58,7 +58,7 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(this);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.activity_complete_info);
         init();
     }
 
@@ -74,14 +74,10 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
         ibSignup.setOnClickListener(this);
 
         etFirstName = (EditText) findViewById(R.id.etFirstName);
-        etPassword = (EditText) findViewById(R.id.etPassword);
-        etConfirmPass = (EditText) findViewById(R.id.etConfirmPass);
         etLastName = (EditText) findViewById(R.id.etLastName);
-        etEmail = (EditText) findViewById(R.id.etEmail);
         etBday = (EditText) findViewById(R.id.etBday);
         etAddress = (EditText) findViewById(R.id.etAddress);
         spGender = (Spinner) findViewById(R.id.gender);
-        etPhoneNumber = (EditText) findViewById(R.id.etPhoneNumber);
         etProfession= (EditText) findViewById(R.id.etProfession);
         btSignup = (Button) findViewById(R.id.btSignUp);
         btSignup.setOnClickListener(this);
@@ -199,18 +195,11 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
             signup_lname = etLastName.getText().toString();
             signup_bday = etBday.getText().toString();
             signup_address = etAddress.getText().toString();
-            signup_email = etEmail.getText().toString();
-            signup_mobile = etPhoneNumber.getText().toString();
-            signup_password = etPassword.getText().toString();
-            signup_confirmPass = etConfirmPass.getText().toString();
             signup_profession = etProfession.getText().toString();
             signup_gender = spGender.getSelectedItem().toString();
 
-            if (!signup_password.equals(signup_confirmPass))
-                showToast(this, "Password hasn't matched");
-            else if ( !signup_profession.isEmpty() && !signup_fname.isEmpty() && !signup_lname.isEmpty() &&
-                    !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_email.isEmpty()
-                    && !signup_mobile.isEmpty() && !signup_password.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-"))
+            if (!signup_profession.isEmpty() && !signup_fname.isEmpty() && !signup_lname.isEmpty() &&
+                    !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-"))
             {
                 intent = new Intent(CompleteProfileActivity.this,ImageUploadActivity.class);
                 startActivity(intent);

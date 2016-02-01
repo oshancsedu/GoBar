@@ -10,6 +10,6 @@
 
     <include
         android:id="@+id/signupForm"
-        layout="@layout/signup_form"/>
+        layout="@layout/complete_profile_form" />
 
 </LinearLayout>

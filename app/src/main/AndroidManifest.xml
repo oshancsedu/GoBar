@@ -82,6 +82,12 @@
             android:label="NID Upload"
             android:screenOrientation="portrait"/>
 
+
+        <activity
+            android:name=".SignupActivity"
+            android:label="Sign Up"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".ImageUploadActivity"
             android:label="Upload"

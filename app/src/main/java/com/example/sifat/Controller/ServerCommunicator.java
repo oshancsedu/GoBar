@@ -72,7 +72,31 @@ public class ServerCommunicator {
         });
     }
 
-    public void sendSignupInfo(){
+    public void sendSignUpInfo() {
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(USER_EMAIL, signup_email);
+        requestParams.put("username", signup_mobile);
+        requestParams.put("password1", signup_password);
+        requestParams.put("password2", signup_password);
+
+        final String signupWebsite = SIGN_UP_WEBSITE;
+        Toast.makeText(context, signupWebsite, Toast.LENGTH_SHORT).show();
+        LoopjHttpClient.post(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                showToast(context, responseBody.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                showToast(context, "Could not Signed up!");
+            }
+        });
+    }
+
+
+    public void completeUserInfo() {
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
 
         ByteArrayOutputStream proPicByteArrayOutputStream = new ByteArrayOutputStream();
@@ -85,11 +109,8 @@ public class ServerCommunicator {
         String encodedNidPic= android.util.Base64.encodeToString(nidPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
         final RequestParams requestParams = new RequestParams();
-        requestParams.put(USER_EMAIL, signup_email);
         requestParams.put(USER_FNAME, signup_fname);
         requestParams.put(USER_LNAME, signup_lname);
-        requestParams.put(USER_MOBILE_NUM, signup_mobile);
-        requestParams.put(USER_PASSWORD, signup_password);
         requestParams.put(USER_ADDRESS, signup_address);
         requestParams.put(USER_BDAY, signup_bday);
         requestParams.put(USER_GENDER, signup_gender);

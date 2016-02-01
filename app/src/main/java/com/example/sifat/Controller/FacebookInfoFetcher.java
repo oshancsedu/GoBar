@@ -64,8 +64,8 @@ public class FacebookInfoFetcher {
                             //JSONObject loc=json.getJSONObject("location");
                             address=json.getJSONObject("location").getString("name");
                             gender=json.getString("gender");
-                            Log.i(LOG_TAG_FACEBOOK,firstName+lastName+bday+address+gender+email);
-                            facebookInfo = new FacebookInfo(email,lastName,firstName,address,bday,gender);
+                            Log.i(LOG_TAG_FACEBOOK, firstName + lastName + bday + address + gender);
+                            facebookInfo = new FacebookInfo(lastName, firstName, address, bday, gender);
                             bundle.putSerializable(USER_FB_INFO,facebookInfo);
                             intent=new Intent(context, ValidationActivity.class);
                             intent.putExtras(bundle);

@@ -83,15 +83,14 @@ public class CommonUtilities {
     public static final String USER_TYPE_STRING="userType";
 
 
-    public static final String SIGN_UP_WEBSITE="192.168.1.111:8000/rest-auth/registration";
+    public static final String SIGN_UP_WEBSITE = "http://192.168.1.111:8000/rest-auth/registration/";
     public static final String LOGIN_WEBSITE="http://inspireitl.com/gober/login.php";
     public static final String LOGOUT_WEBSITE = "http://inspireitl.com/gober/logout.php";
     public static final String TAXI_POSITION_ADDRESS= "http://aimsil.com/uber/taxiposition.txt";
     public static final String PROFILE_INFO_URL="";
     public static final String LOGIN_WITH_FB="isLoginWithFacebook";
 
-    ////GCM Registration number
-
+    ///GCM Registration number
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String SENDER_PROJECT_ID="307986532903";
     public static final String GCM_REGISTER_ID="gcmRegID";
