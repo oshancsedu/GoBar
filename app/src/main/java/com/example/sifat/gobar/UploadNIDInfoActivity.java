@@ -36,7 +36,6 @@ public class UploadNIDInfoActivity extends ActionBarActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_nid);
         init();
-
     }
 
     private void init() {
@@ -66,7 +65,6 @@ public class UploadNIDInfoActivity extends ActionBarActivity implements View.OnC
                 NDIPic = ((BitmapDrawable) ivNid.getDrawable()).getBitmap();
                 serverCommunicator.completeUserInfo();
             }
-
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.sifat.gobar;
 
 import com.example.sifat.Controller.HttpConnection;
+import com.example.sifat.Controller.ServerCommunicator;
 import com.example.sifat.Custom.CustomMapFragmment;
 import com.example.sifat.Domain.TaxiDetail;
 import com.example.sifat.Receiver.TaxiDetailReceiver;
@@ -69,9 +70,10 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         SearchView.OnQueryTextListener,
         GoogleMap.OnCameraChangeListener,
         GoogleMap.OnMarkerClickListener,
-        CustomMapFragmment.OnTouchListener, NavigationView.OnNavigationItemSelectedListener {
+        CustomMapFragmment.OnTouchListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
-    List<Address> addressList;
+    private List<Address> addressList;
     private GoogleMap mMap;
     private UiSettings mUiSettings;
     private TextView tvSrcAddress, tvDistAddress, tvDrivername, tvDriverMobileNumber;
@@ -103,6 +105,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private Bundle taxiHireInfoBundle;
     private DrawerLayout dlMenu;
     private NavigationView navView;
+    private ServerCommunicator serverCommunicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +143,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         editor.putBoolean("flag", true);
         editor.putBoolean("init", false);
         editor.commit();
+
+        serverCommunicator = new ServerCommunicator(this);
 
         offset = 300.0f;
         //istapped-> so that when user is tapped into the marker & change the camera position service for getting address is not being called unnecessarily
@@ -209,6 +214,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         locationProvider.getMyLocaton();
     }
 
+
     /**********
      * Get New LatLong When Camera is changed
      ********/
@@ -230,7 +236,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 startLocationIntentService(searchLatLng);
         }
     }
-
 
     @Override
     public void onClick(View view) {
@@ -290,7 +295,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 } else
                     Toast.makeText(this, getString(R.string.sameSrcDistError), Toast.LENGTH_SHORT).show();
             }
-        } else if (view.getId() == R.id.btHire) {
+        }
+        else if (view.getId() == R.id.btHire) {
             Location startingLoc = new Location("");
             startingLoc.setLatitude(srcMarker.getPosition().latitude);
             startingLoc.setLongitude(srcMarker.getPosition().longitude);
@@ -300,6 +306,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             taxiLoc.setLongitude(selectedDriverMarker.getPosition().longitude);
             float distanceInMeter = startingLoc.distanceTo(taxiLoc) / 1000;
             Toast.makeText(this, String.format(getString(R.string.driverSelected), distanceInMeter), Toast.LENGTH_SHORT).show();
+
+
 
             //HireInfo Detail Bundle
             Intent notifyIntent = new Intent(MapsActivity.this, TaxiHireConfirmationNotify.class);
@@ -313,7 +321,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             taxiHireInfoBundle.putString(HIRE_STATUS_MESSAGE, message);
             notifyIntent.putExtras(taxiHireInfoBundle);
             startService(notifyIntent);
-
         }
     }
 

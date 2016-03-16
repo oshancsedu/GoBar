@@ -34,6 +34,7 @@ public class ImageUploadActivity extends ActionBarActivity implements View.OnCli
     private ImageView ivProfilePic;
     private static final int RESULT_LODE_IMAGE=10001;
     private static final int RESULT_TAKE_IMAGE=10002;
+    private boolean isPictureTaken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class ImageUploadActivity extends ActionBarActivity implements View.OnCli
     }
 
     private void init() {
+        isPictureTaken=false;
         ivProfilePic = (ImageView) findViewById(R.id.ivUploadProfilePic);
         btChooseImage = (Button) findViewById(R.id.btUploadFromGallery);
         btTakeImage = (Button) findViewById(R.id.btTakePhoto);
@@ -87,28 +89,26 @@ public class ImageUploadActivity extends ActionBarActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(resultCode==RESULT_OK && data != null)
-        {
-            if(requestCode == RESULT_LODE_IMAGE)
-            {
-                Uri selectedImages= data.getData();
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == RESULT_LODE_IMAGE) {
+                Uri selectedImages = data.getData();
                 InputStream inputStream;
                 try {
                     inputStream = getContentResolver().openInputStream(selectedImages);
                     //ivProfilePic.setImageBitmap(BitmapFactory.decodeStream(inputStream));
-                    Picasso.with(this).load(selectedImages).resize(200,200).centerCrop().into(ivProfilePic);
+                    Picasso.with(this).load(selectedImages).resize(200, 200).centerCrop().into(ivProfilePic);
+                    isPictureTaken=true;
                 } catch (Exception e) {
-                    showToast(this,"Problem in loading image");
+                    showToast(this, "Problem in loading image");
                 }
-            }
-            else if(requestCode==RESULT_TAKE_IMAGE)
-            {
-                Bundle extras= data.getExtras();
+            } else if (requestCode == RESULT_TAKE_IMAGE) {
+                Bundle extras = data.getExtras();
                 Bitmap source = (Bitmap) extras.get("data");
                 int size = Math.min(source.getWidth(), source.getHeight());
                 int x = (source.getWidth() - size) / 2;
                 int y = (source.getHeight() - size) / 2;
-                ivProfilePic.setImageBitmap(Bitmap.createBitmap(source,x,y,size,size));
+                ivProfilePic.setImageBitmap(Bitmap.createBitmap(source, x, y, size, size));
+                isPictureTaken=true;
             }
         }
     }

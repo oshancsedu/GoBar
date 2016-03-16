@@ -9,8 +9,11 @@ import android.util.Base64;
 import android.widget.Toast;
 
 import com.example.sifat.Utilities.LoopjHttpClient;
+import com.example.sifat.gobar.CompleteProfileActivity;
+import com.example.sifat.gobar.ImageUploadActivity;
 import com.example.sifat.gobar.LoginActivity;
 import com.example.sifat.gobar.MapsActivity;
+import com.example.sifat.gobar.UploadNIDInfoActivity;
 import com.example.sifat.gobar.WelcomeActivity;
 import com.loopj.android.http.*;
 
@@ -75,17 +78,16 @@ public class ServerCommunicator {
     public void sendSignUpInfo() {
         final RequestParams requestParams = new RequestParams();
         requestParams.put(USER_EMAIL, signup_email);
-        requestParams.put("username", signup_mobile);
-        requestParams.put("password1", signup_password);
-        requestParams.put("password2", signup_password);
+        requestParams.put(USER_NAME, signup_username);
+        requestParams.put(USER_PASSWORD, signup_password);
 
         final String signupWebsite = SIGN_UP_WEBSITE;
-        Toast.makeText(context, signupWebsite, Toast.LENGTH_SHORT).show();
+        showToast(context, signupWebsite);
         LoopjHttpClient.post(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                showToast(context, responseBody.toString());
+                showToast(context, new String(responseBody));
             }
 
             @Override
@@ -95,18 +97,17 @@ public class ServerCommunicator {
         });
     }
 
-
     public void completeUserInfo() {
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
 
         ByteArrayOutputStream proPicByteArrayOutputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream nidPicByteArrayOutputStream = new ByteArrayOutputStream();
 
-        proPic.compress(Bitmap.CompressFormat.JPEG,100,proPicByteArrayOutputStream);
-        String encodedProPicImage= android.util.Base64.encodeToString(proPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+        proPic.compress(Bitmap.CompressFormat.JPEG, 100, proPicByteArrayOutputStream);
+        String encodedProPicImage = Base64.encodeToString(proPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
-        NDIPic.compress(Bitmap.CompressFormat.JPEG,100,nidPicByteArrayOutputStream);
-        String encodedNidPic= android.util.Base64.encodeToString(nidPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+        NDIPic.compress(Bitmap.CompressFormat.JPEG, 100, nidPicByteArrayOutputStream);
+        String encodedNidPic = Base64.encodeToString(nidPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
         final RequestParams requestParams = new RequestParams();
         requestParams.put(USER_FNAME, signup_fname);
@@ -119,59 +120,109 @@ public class ServerCommunicator {
         requestParams.put(USER_PRO_PIC, encodedProPicImage);
         requestParams.put(USER_NID_PIC, encodedNidPic);
         requestParams.put(USER_PROFESSON, signup_profession);
-        requestParams.put(USER_TYPE_STRING,USER_TYPE);
+        requestParams.put(USER_TYPE_STRING, USER_TYPE);
+        requestParams.put(USER_MOBILE_NUM, signup_mobile);
 
-        final String signupWebsite = SIGN_UP_WEBSITE;
-        Toast.makeText(context,signupWebsite,Toast.LENGTH_SHORT).show();
-        LoopjHttpClient.get(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
-
+        final String signupWebsite = COMPLETE_USER_INFO_WEBSITE;
+        Toast.makeText(context, signupWebsite, Toast.LENGTH_SHORT).show();
+        LoopjHttpClient.post(signupWebsite, requestParams, new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - success", signupWebsite, requestParams, responseBody, headers, statusCode, null, context);
+                showToast(context, new String(responseBody));
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - failure", signupWebsite, requestParams, responseBody, headers, statusCode, error, context);
+                showToast(context, "Error!");
             }
 
         });
-
     }
 
-    public void login(String email,String pass,String gcm_regId,boolean isFacebook){
+    public void login(String username, String pass, String gcm_regId, boolean isFacebook) {
         final RequestParams requestParams = new RequestParams();
-        requestParams.put(USER_EMAIL,email);
-        requestParams.put(USER_PASSWORD,pass);
-        requestParams.put(GCM_REGISTER_ID,gcm_regId);
-        requestParams.put(LOGIN_WITH_FB,isFacebook);
+        requestParams.put(USER_NAME, username);
+        requestParams.put(USER_PASSWORD, pass);
+        requestParams.put(GCM_REGISTER_ID, gcm_regId);
+        requestParams.put(LOGIN_WITH_FB, isFacebook);
 
         final String loginWebsite = LOGIN_WEBSITE;
-        //Toast.makeText(context,loginWebsite,Toast.LENGTH_SHORT).show();
-        LoopjHttpClient.get(loginWebsite, requestParams, new AsyncHttpResponseHandler() {
+        Toast.makeText(context,loginWebsite,Toast.LENGTH_SHORT).show();
 
+        LoopjHttpClient.post(loginWebsite, requestParams, new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - success", loginWebsite, requestParams, responseBody, headers, statusCode, null, context);
-                String response= new String(responseBody);
-                if(response.equalsIgnoreCase("failed"))
-                    showToast(context, "Login has Failed");
-                else
-                {
-                    //showToast(context, response);
-                    saveUserInfo(response);
-                    changeActivity(MapsActivity.class);
+                //LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - success", loginWebsite, requestParams, responseBody, headers, statusCode, null, context);
+                String response = new String(responseBody);
+                if (saveAccessToken(response)) {
+                    getUserStatus();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - failure", loginWebsite, requestParams, responseBody, headers, statusCode, error, context);
+                //LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - failure", loginWebsite, requestParams, responseBody, headers, statusCode, error, context);
+                String response = new String(responseBody);
+                checkResponse(response);
             }
         });
     }
+
+    private void getUserStatus() {
+
+        String accessToken = sharedPreferences.getString(SERVER_ACCESS_TOKEN,"");
+        final String userStatusWebsite = USER_STATUS_WEBSITE;
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(SERVER_ACCESS_TOKEN, accessToken);
+
+        LoopjHttpClient.post(userStatusWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                showToast(context,response);
+                checkUserStatus(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
+    }
+
+    private void checkUserStatus(String res) {
+
+        try {
+            JSONObject response = new JSONObject(res);
+            String status = response.getString("status");
+            if(status.equalsIgnoreCase(USER_STATUS_1))
+            {
+                changeActivity(CompleteProfileActivity.class);
+            }
+            else if(status.equalsIgnoreCase(USER_STATUS_2))
+            {
+                saveUserInfo(response);
+                changeActivity(MapsActivity.class);
+            }
+            else if(status.equalsIgnoreCase(USER_STATUS_3))
+            {
+                changeActivity(ImageUploadActivity.class);
+            }
+            else if(status.equalsIgnoreCase(USER_STATUS_4))
+            {
+                changeActivity(UploadNIDInfoActivity.class);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     public void logout(String gcmRegID, String userRegID) {
@@ -221,36 +272,40 @@ public class ServerCommunicator {
         editor.commit();
     }
 
-    private void saveUserInfo(String response) {
+    private void saveUserInfo(JSONObject userInfo) {
         try {
-            JSONObject userInfo = new JSONObject(response);
+            Log.e("JSON", "1");
+            editor.putString(USER_RATING, userInfo.getString(USER_RATING));
+            editor.putString(USER_BALANCE, userInfo.getString(USER_BALANCE));
 
-            editor.putString(USER_RATING,userInfo.getString("userRating"));
-            editor.putString(USER_BALANCE,userInfo.getString("userBalance"));
-            editor.putString(USER_PRO_PIC_URL, userInfo.getString("proPicURL"));
-            editor.putString(USER_PROFESSION,userInfo.getString("userProfession"));
-            editor.putString(USER_NID,userInfo.getString("userNID"));
-            editor.putString(USER_EMAIL, userInfo.getString("email"));
-            editor.putString(USER_BDAY, userInfo.getString("birthday"));
-            editor.putString(USER_GENDER, userInfo.getString("gender"));
-            editor.putString(USER_MOBILE_NUM, userInfo.getString("mobile"));
-            editor.putString(USER_ADDRESS, userInfo.getString("location"));
-            editor.putString(USER_FNAME, userInfo.getString("first_name"));
-            editor.putString(USER_LNAME, userInfo.getString("last_name"));
-            editor.putString(USER_NAME, userInfo.getString("first_name") + " " + userInfo.getString("last_name"));
-            editor.putString(USER_REGISTRATION_ID, userInfo.getString("id"));
+            editor.putString(USER_PRO_PIC_URL, userInfo.getString(USER_PRO_PIC_URL));
+            editor.putString(USER_PROFESSION, userInfo.getString(USER_PROFESSION));
+            //editor.putString(USER_NID, userInfo.getString("userNID"));
+            Log.e("JSON", "2");
+            editor.putString(USER_EMAIL, userInfo.getString(USER_EMAIL));
+            editor.putString(USER_BDAY, userInfo.getString(USER_BDAY));
+            editor.putString(USER_GENDER, userInfo.getString(USER_GENDER));
+            editor.putString(USER_MOBILE_NUM, userInfo.getString(USER_MOBILE_NUM));
+            editor.putString(USER_ADDRESS, userInfo.getString(USER_ADDRESS));
+            editor.putString(USER_FNAME, userInfo.getString(USER_FNAME));
+            editor.putString(USER_LNAME, userInfo.getString(USER_LNAME));
+            editor.putString(USER_NAME, userInfo.getString(USER_FNAME) + " " + userInfo.getString(USER_LNAME));
+            Log.e("JSON", "3");
+            //editor.putString(USER_REGISTRATION_ID, userInfo.getString("id"));
             editor.commit();
 
             showToast(context, sharedPreferences.getString(USER_ADDRESS, "") + sharedPreferences.getString(USER_EMAIL, "") +
                     sharedPreferences.getString(USER_FNAME, "") + sharedPreferences.getString(USER_LNAME, "") +
                     sharedPreferences.getString(USER_BDAY, "") + sharedPreferences.getString(USER_GENDER, "") +
-                    sharedPreferences.getString(USER_REGISTRATION_ID, "") + sharedPreferences.getString(USER_MOBILE_NUM, ""));
+                    sharedPreferences.getString(USER_MOBILE_NUM, ""));
 
 
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.e("JSON", "ERROR");
         }
     }
+
 
     private void setSharedPreferences() {
         sharedPreferences = getSharedPref(context);
@@ -261,5 +316,37 @@ public class ServerCommunicator {
 
         Intent intent = new Intent(context,activityclass);
         context.startActivity(intent);
+    }
+
+    private void checkResponse(String response) {
+
+        try {
+            JSONObject errorStatus= new JSONObject(response);
+            Log.i(LOG_TAG_LOGIN,errorStatus.getString("non_field_errors"));
+            String res=errorStatus.getString("non_field_errors");
+            res= res.substring(2,res.length()-2);
+            showToast(context,res);
+
+        } catch (JSONException e) {
+            Log.i(LOG_TAG_LOGIN,"Error");
+        }
+    }
+
+    public boolean saveAccessToken(String response) {
+        JSONObject accessToken;
+        try {
+            accessToken = new JSONObject(response);
+            if(accessToken.has("auth_token"))
+            {
+                showToast(context, accessToken.getString("auth_token"));
+                editor.putString(SERVER_ACCESS_TOKEN, accessToken.getString("auth_token"));
+                editor.commit();
+                return true;
+            }
+        } catch (JSONException e) {
+            showToast(context, "Problem with login. Try again later");
+            return false;
+        }
+        return false;
     }
 }

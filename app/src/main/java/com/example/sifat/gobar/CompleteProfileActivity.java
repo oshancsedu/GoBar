@@ -49,7 +49,7 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
     private FacebookInfoFetcher facebookInfoFetcher;
-    private EditText etFirstName, etLastName, etAddress, etBday, etProfession;
+    private EditText etFirstName, etLastName, etAddress, etBday, etProfession, etMobileNumber;
     private Button btSignup;
     private Spinner spGender;
     private Toolbar toolbar;
@@ -76,6 +76,7 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
         etFirstName = (EditText) findViewById(R.id.etFirstName);
         etLastName = (EditText) findViewById(R.id.etLastName);
         etBday = (EditText) findViewById(R.id.etBday);
+        etMobileNumber = (EditText) findViewById(R.id.etMobileNumber);
         etAddress = (EditText) findViewById(R.id.etAddress);
         spGender = (Spinner) findViewById(R.id.gender);
         etProfession= (EditText) findViewById(R.id.etProfession);
@@ -197,15 +198,13 @@ public class CompleteProfileActivity extends ActionBarActivity implements View.O
             signup_address = etAddress.getText().toString();
             signup_profession = etProfession.getText().toString();
             signup_gender = spGender.getSelectedItem().toString();
+            signup_mobile = etMobileNumber.getText().toString();
 
-            if (!signup_profession.isEmpty() && !signup_fname.isEmpty() && !signup_lname.isEmpty() &&
-                    !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-"))
-            {
-                intent = new Intent(CompleteProfileActivity.this,ImageUploadActivity.class);
+            if (!signup_profession.isEmpty() && !signup_fname.isEmpty() && !signup_lname.isEmpty() && !signup_mobile.isEmpty() &&
+                    !signup_bday.isEmpty() && !signup_address.isEmpty() && !signup_gender.equalsIgnoreCase("-Gender-")) {
+                intent = new Intent(CompleteProfileActivity.this, ImageUploadActivity.class);
                 startActivity(intent);
-            }
-
-            else
+            } else
                 showToast(this, "Fill up all the field");
         }
     }
