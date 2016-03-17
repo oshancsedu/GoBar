@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.support.multidex.MultiDexApplication;
 import android.util.Base64;
 import android.util.Log;
 
@@ -16,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
  * Created by Sifat on 10/29/2015.
  */
 
-public class MyApplication extends Application {
+public class MyApplication extends MultiDexApplication {
 
     @Override
     public void onCreate() {

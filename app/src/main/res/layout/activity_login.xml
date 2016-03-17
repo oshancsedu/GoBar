@@ -54,7 +54,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:background="#fff"
-            android:src="@drawable/facebookbutton" />
+            android:src="@drawable/fblogin" />
 
     </RelativeLayout>
 </LinearLayout>

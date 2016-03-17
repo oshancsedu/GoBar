@@ -37,7 +37,7 @@ public class AddressFetcher extends IntentService {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         LatLng latLng = intent.getParcelableExtra(LATLNG_DATA_EXTRA);
         mReceiver = intent.getParcelableExtra(ADDRESS_RECIEVER);
-        Log.i("Service", "Lat: " + latLng.latitude + "\nLng: " + latLng.longitude);
+//        Log.i("Service", "Lat: " + latLng.latitude + "\nLng: " + latLng.longitude);
 
         List<Address> addresses = null;
         String errorMessage = "";
