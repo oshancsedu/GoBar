@@ -99,6 +99,8 @@ public class ServerCommunicator {
 
     public void completeUserInfo() {
         String gcmRegNum = sharedPreferences.getString(GCM_REGISTER_ID, "");
+        String userID = sharedPreferences.getString(USER_ID,"");
+        String accessToken = sharedPreferences.getString(SERVER_ACCESS_TOKEN,"");
 
         ByteArrayOutputStream proPicByteArrayOutputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream nidPicByteArrayOutputStream = new ByteArrayOutputStream();
@@ -110,6 +112,8 @@ public class ServerCommunicator {
         String encodedNidPic = Base64.encodeToString(nidPicByteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
         final RequestParams requestParams = new RequestParams();
+        //requestParams.put(USER_ID,userID);
+        requestParams.put(SERVER_ACCESS_TOKEN,accessToken);
         requestParams.put(USER_FNAME, signup_fname);
         requestParams.put(USER_LNAME, signup_lname);
         requestParams.put(USER_ADDRESS, signup_address);
@@ -185,6 +189,9 @@ public class ServerCommunicator {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
                 showToast(context,response);
+
+                Log.i(LOG_TAG_LOGIN,response.toString());
+
                 checkUserStatus(response);
             }
 
@@ -194,35 +201,6 @@ public class ServerCommunicator {
             }
         });
     }
-
-    private void checkUserStatus(String res) {
-
-        try {
-            JSONObject response = new JSONObject(res);
-            String status = response.getString("status");
-            if(status.equalsIgnoreCase(USER_STATUS_1))
-            {
-                changeActivity(CompleteProfileActivity.class);
-            }
-            else if(status.equalsIgnoreCase(USER_STATUS_2))
-            {
-                saveUserInfo(response);
-                changeActivity(MapsActivity.class);
-            }
-            else if(status.equalsIgnoreCase(USER_STATUS_3))
-            {
-                changeActivity(ImageUploadActivity.class);
-            }
-            else if(status.equalsIgnoreCase(USER_STATUS_4))
-            {
-                changeActivity(UploadNIDInfoActivity.class);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 
     public void logout(String gcmRegID, String userRegID) {
@@ -234,7 +212,6 @@ public class ServerCommunicator {
         //showToast(context, logoutWebsite);
 
         LoopjHttpClient.get(logoutWebsite, requestParams, new AsyncHttpResponseHandler() {
-
 
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
@@ -255,8 +232,67 @@ public class ServerCommunicator {
                 LoopjHttpClient.debugLoopJ(LOG_TAG_SIGNUP, "sendLocationDataToWebsite - failure", logoutWebsite, requestParams, responseBody, headers, statusCode, error, context);
             }
         });
-
     }
+
+    public void rideRequest(double srcLat,double srcLng,double distLat,double distLng)
+    {
+        String accessToken= sharedPreferences.getString(SERVER_ACCESS_TOKEN,"");
+        RequestParams requestParams = new RequestParams();
+        requestParams.put(SRC_LAT,srcLat);
+        requestParams.put(SRC_LNG,srcLng);
+        requestParams.put(DIST_LAT,distLat);
+        requestParams.put(DIST_LNG,distLng);
+        requestParams.put(SERVER_ACCESS_TOKEN,accessToken);
+
+        final String rideRequestWebsite = RIDE_REQUEST_WEBSITE;
+        Toast.makeText(context,rideRequestWebsite,Toast.LENGTH_SHORT).show();
+
+        LoopjHttpClient.post(rideRequestWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                Log.i(LOG_TAG_LOGIN,new String(responseBody));
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Log.i(LOG_TAG_LOGIN,new String(responseBody));
+            }
+        });
+    }
+
+    private void checkUserStatus(String res) {
+
+        try {
+            JSONObject response = new JSONObject(res);
+            String status = response.getString("status");
+            if(status.equalsIgnoreCase(USER_STATUS_1))
+            {
+                changeActivity(CompleteProfileActivity.class);
+            }
+            else if(status.equalsIgnoreCase(USER_STATUS_2))
+            {
+                saveUserInfo(response);
+                changeActivity(MapsActivity.class);
+            }
+            else if(status.equalsIgnoreCase(USER_STATUS_3))
+            {
+                /*editor.putString(USER_ID, response.getString(USER_ID));
+                editor.commit();*/
+                changeActivity(ImageUploadActivity.class);
+            }
+            else if(status.equalsIgnoreCase(USER_STATUS_4))
+            {/*
+                editor.putString(USER_ID,response.getString(USER_ID));
+                editor.commit();*/
+                changeActivity(UploadNIDInfoActivity.class);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void eraseUserInfo() {
         editor.remove(USER_EMAIL);
@@ -274,14 +310,14 @@ public class ServerCommunicator {
 
     private void saveUserInfo(JSONObject userInfo) {
         try {
-            Log.e("JSON", "1");
+            Log.i(LOG_TAG_LOGIN, userInfo.toString());
             editor.putString(USER_RATING, userInfo.getString(USER_RATING));
             editor.putString(USER_BALANCE, userInfo.getString(USER_BALANCE));
-
+            //editor.putString(USER_ID,userInfo.getString(USER_ID));
             editor.putString(USER_PRO_PIC_URL, userInfo.getString(USER_PRO_PIC_URL));
             editor.putString(USER_PROFESSION, userInfo.getString(USER_PROFESSION));
             //editor.putString(USER_NID, userInfo.getString("userNID"));
-            Log.e("JSON", "2");
+            Log.i(LOG_TAG_LOGIN, "2");
             editor.putString(USER_EMAIL, userInfo.getString(USER_EMAIL));
             editor.putString(USER_BDAY, userInfo.getString(USER_BDAY));
             editor.putString(USER_GENDER, userInfo.getString(USER_GENDER));

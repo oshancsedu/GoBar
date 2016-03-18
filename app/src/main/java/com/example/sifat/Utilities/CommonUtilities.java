@@ -47,6 +47,10 @@ public class CommonUtilities {
     public static final String HIRE_STATUS_MESSAGE = "hireTaxiStatus";
     public static final String SRC_LATLNG = "scrLatLng";
     public static final String DIST_LATLNG = "distLatLng";
+    public static final String DIST_LAT="distLat";
+    public static final String DIST_LNG="distLng";
+    public static final String SRC_LAT="srcLat";
+    public static final String SRC_LNG="srcLng";
     public static final String SELECTED_DRIVER_NAME = "selectedDriverName";
     public static final String SELECTED_DRIVER_MOBILE = "selectedDriverMobile";
     public static final String SELECTED_DRIVER_RATING = "selectedDriverRating";
@@ -64,6 +68,7 @@ public class CommonUtilities {
     public static final String LOG_TAG_LOGIN="login";
 
     public static final String USER_RATING="userRating";
+    public static final String USER_ID="userID";
     public static final String USER_BALANCE="userBalance";
     public static final String USER_PROFESSION="userProfession";
     public static final String USER_PRO_PIC_URL="proPicURL";
@@ -100,6 +105,7 @@ public class CommonUtilities {
     public static final String PROFILE_INFO_URL = "";
     public static final String LOGIN_WITH_FB = "isLoginWithFacebook";
     public static final String USER_STATUS_WEBSITE="http://aimsil.com/uber/userInfo.php";
+    public static final String RIDE_REQUEST_WEBSITE="http://aimsil.com/uber/rideRequest.php";
 
 
     ///GCM Registration number

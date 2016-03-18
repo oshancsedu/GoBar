@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,8 +30,11 @@ public class ProfileActivity extends ActionBarActivity implements NavigationView
 
     private ImageView profilePic;
     private SharedPreferences sharedPreferences;
-    private TextView tvUserName,tvAddress,tvEmail,tvMobile,tvProfession,tvBalance;
+    private TextView tvUserName,tvAddress,tvEmail,tvMobile,tvProfession,tvBalance,tvGender,tvBday;
     private Toolbar toolbar;
+    private String profilePicURL,mobileNumber,email,profession,gender,fname,lname,address,bDay;
+    private float rating,balance;
+    private RatingBar rbUserRatingBar;
     private DrawerLayout dlMenu;
     private NavigationView navView;
 
@@ -55,16 +59,49 @@ public class ProfileActivity extends ActionBarActivity implements NavigationView
         /*navView = (NavigationView) findViewById(R.id.navigation);
         navView.setNavigationItemSelectedListener(this);*/
 
-        sharedPreferences = getSharedPreferences(String.valueOf(R.string.sharedPref), this.MODE_PRIVATE);
-        profilePic= (ImageView) findViewById(R.id.ivProfilepic);
+        sharedPreferences = getSharedPref(this);
+        profilePicURL = sharedPreferences.getString(USER_PRO_PIC_URL, "");
+        rating = Float.parseFloat(sharedPreferences.getString(USER_RATING, "0.0"));
+        balance = Float.parseFloat(sharedPreferences.getString(USER_BALANCE, "0.0"));
+        email = sharedPreferences.getString(USER_EMAIL, "");
+        address = sharedPreferences.getString(USER_ADDRESS, "");
+        gender = sharedPreferences.getString(USER_GENDER, "");
+        mobileNumber = sharedPreferences.getString(USER_MOBILE_NUM, "");
+        fname = sharedPreferences.getString(USER_FNAME, "");
+        lname = sharedPreferences.getString(USER_LNAME, "");
+        profession = sharedPreferences.getString(USER_PROFESSION, "");
+        bDay = sharedPreferences.getString(USER_BDAY, "");
 
-        Picasso.with(this).load(profileImgUrl).resize(200,200).centerCrop().into(profilePic);
+        profilePic= (ImageView) findViewById(R.id.ivProfilepic);
+        Picasso.with(this).load(profilePicURL).resize(200,200).centerCrop().into(profilePic);
+
         tvUserName=(TextView)findViewById(R.id.tvUserName);
-        tvAddress=(TextView)findViewById(R.id.tvAddrss);
+        tvUserName.setText(fname + " " + lname);
+
+        tvAddress=(TextView)findViewById(R.id.tvAddress);
+        tvAddress.setText(address);
+
         tvEmail=(TextView)findViewById(R.id.tvEmail);
+        tvEmail.setText(email);
+
         tvMobile=(TextView)findViewById(R.id.tvPhone);
+        tvMobile.setText(mobileNumber);
+
         tvBalance=(TextView)findViewById(R.id.tvBalance);
+        tvBalance.setText("Your Balance is "+balance+" taka");
+
         tvProfession=(TextView)findViewById(R.id.tvProfession);
+        tvProfession.setText(profession);
+
+        rbUserRatingBar = (RatingBar) findViewById(R.id.rbUserRate);
+        rbUserRatingBar.setRating(rating + 0.5f);
+        rbUserRatingBar.setRating(rating);
+
+        tvBday = (TextView) findViewById(R.id.tvBirthday);
+        tvBday.setText(bDay);
+
+        tvGender = (TextView) findViewById(R.id.tvGender);
+        tvGender.setText(gender);
     }
 
     /******

@@ -307,7 +307,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             float distanceInMeter = startingLoc.distanceTo(taxiLoc) / 1000;
             Toast.makeText(this, String.format(getString(R.string.driverSelected), distanceInMeter), Toast.LENGTH_SHORT).show();
 
-
+            serverCommunicator.rideRequest(srcMarker.getPosition().latitude,srcMarker.getPosition().longitude,distMarker.getPosition().latitude,distMarker.getPosition().longitude);
 
             //HireInfo Detail Bundle
             Intent notifyIntent = new Intent(MapsActivity.this, TaxiHireConfirmationNotify.class);
