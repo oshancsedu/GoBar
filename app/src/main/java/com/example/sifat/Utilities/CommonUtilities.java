@@ -33,6 +33,18 @@ public class CommonUtilities {
             signup_mobile, signup_password, signup_gender, signup_confirmPass,signup_profession,signup_NID,signup_username;
     public static Bitmap proPic,NDIPic;
 
+
+    //GCM message tag
+    public static final String RIDE_PAYMENT="payment";
+
+    public static final String SELECTED_USER_NAME = "selectedUserName";
+    public static final String SELECTED_USER_MOBILE = "selectedUserMobile";
+    public static final String SELECTED_USER_RATING = "selectedUserRating";
+    public static final String SELECTED_USER_ID = "selectedUserId";
+    public static final String HIRE_STATUS_MESSAGE = "hireStatus";
+    public static final String GCM_MESSAGE="message";
+
+
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
     public static final int NOTIFICATION_ID = 1;
@@ -44,7 +56,6 @@ public class CommonUtilities {
     public static final String GMAP_KEY="gmap";
     public static final String TAXIDETAIL_RECIEVER="getTaxiDetailReviever";
     public static final String RESULT_TAXIDETAIL_KEY="getTaxiDetail";
-    public static final String HIRE_STATUS_MESSAGE = "hireTaxiStatus";
     public static final String SRC_LATLNG = "scrLatLng";
     public static final String DIST_LATLNG = "distLatLng";
     public static final String DIST_LAT="distLat";
