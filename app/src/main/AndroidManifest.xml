@@ -43,6 +43,8 @@
         <service android:name="com.example.sifat.Services.AddressFetcher"/>
         <service android:name="com.example.sifat.Services.TaxiHireConfirmationNotify" />
         <service android:name="com.example.sifat.Services.GcmIntentService"/>
+        <service android:name="com.example.sifat.Services.OnRideService"/>
+        <service android:name="com.example.sifat.Services.PaymentService"/>
 
         <receiver android:name="com.example.sifat.Receiver.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >

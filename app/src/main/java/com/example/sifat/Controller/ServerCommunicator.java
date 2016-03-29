@@ -251,12 +251,37 @@ public class ServerCommunicator {
 
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                Log.i(LOG_TAG_LOGIN,new String(responseBody));
+                Log.i(LOG_TAG_LOGIN, new String(responseBody));
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                Log.i(LOG_TAG_LOGIN,new String(responseBody));
+                Log.i(LOG_TAG_LOGIN, new String(responseBody));
+            }
+        });
+    }
+
+    public void endRide(float rating,String userId)
+    {
+        final RequestParams requestParams = new RequestParams();
+        requestParams.put(USER_RATING,rating);
+        requestParams.put(USER_REGISTRATION_ID, userId);
+
+        final String endRideWebsite= END_RIDE_WEBSITE;
+        LoopjHttpClient.post(endRideWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                Log.i("Req", response);
+                showToast(context, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                String response = new String(responseBody);
+                Log.i("Req", response);
+                showToast(context, response);
             }
         });
     }

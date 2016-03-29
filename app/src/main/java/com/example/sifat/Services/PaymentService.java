@@ -12,12 +12,12 @@ import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.sifat.uberdriver.R;
+import com.example.sifat.gobar.R;
 
-import static com.sifat.Utilities.CommonUtilities.LOG_TAG_GCM;
-import static com.sifat.Utilities.CommonUtilities.NOTIFICATION_ID;
-import static com.sifat.Utilities.CommonUtilities.USER_BALANCE;
-import static com.sifat.Utilities.CommonUtilities.getSharedPref;
+import static com.example.sifat.Utilities.CommonUtilities.LOG_TAG_GCM;
+import static com.example.sifat.Utilities.CommonUtilities.NOTIFICATION_ID;
+import static com.example.sifat.Utilities.CommonUtilities.USER_BALANCE;
+import static com.example.sifat.Utilities.CommonUtilities.getSharedPref;
 
 /**
  * Created by Md. Sifat-Ul Haque on 3/25/2016.

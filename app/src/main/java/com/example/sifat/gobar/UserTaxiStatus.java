@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +19,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sifat.Controller.ServerCommunicator;
 import com.example.sifat.Custom.CustomMapFragmment;
 import com.example.sifat.Dialogues.DriverRating;
 import com.github.polok.routedrawer.RouteApi;
@@ -60,31 +63,40 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
     private Marker srcMarker, distMarker;
     private TextView tvDrivername, tvDriverMobile;
     private RatingBar rbDriverRate;
-    private float rating;
+    private float rating, lat, lng;
     private Toolbar toolbar;
-    private int driverId;
+    private String driverId;
     private DriverRating driverRating;
     private String driverName;
     private FloatingActionButton fbReleaseTaxi;
     private NotificationManager mNotificationManager;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private ServerCommunicator serverCommunicator;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_taxi_status);
-        inti();
+        init();
         bundle = getIntent().getExtras();
-        srcLatLng = bundle.getParcelable(SRC_LATLNG);
-        distLatLng = bundle.getParcelable(DIST_LATLNG);
+
+        lat = Float.parseFloat(bundle.getString(SRC_LAT));
+        lng = Float.parseFloat(bundle.getString(SRC_LNG));
+
+        srcLatLng = new LatLng(lat, lng);
+
+        lat = Float.parseFloat(bundle.getString(DIST_LAT));
+        lng = Float.parseFloat(bundle.getString(DIST_LNG));
+
+        distLatLng = new LatLng(lat, lng);
 
         driverName = bundle.getString(SELECTED_DRIVER_NAME);
         tvDrivername.setText(driverName);
         tvDriverMobile.setText(bundle.getString(SELECTED_DRIVER_MOBILE));
-        rating = bundle.getFloat(SELECTED_DRIVER_RATING);
-        driverId = bundle.getInt(SELECTED_DRIVER_ID);
+        rating = Float.parseFloat(bundle.getString(SELECTED_DRIVER_RATING));
+        driverId = bundle.getString(SELECTED_DRIVER_ID);
         rbDriverRate.setRating(rating + 0.5f);
         rbDriverRate.setRating(rating);
 
@@ -94,7 +106,7 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
         customMapFragmment.getMapAsync(this);
     }
 
-    private void inti() {
+    private void init() {
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         mNotificationManager = (NotificationManager)
@@ -109,6 +121,8 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
         driverRating = new DriverRating();
         fbReleaseTaxi = (FloatingActionButton) findViewById(R.id.fbReleaseTaxi);
         fbReleaseTaxi.setOnClickListener(this);
+
+        serverCommunicator = new ServerCommunicator(this);
     }
 
 
@@ -204,7 +218,11 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
 
     @Override
     public void RatingDialog() {
-        doBkash();
+
+        serverCommunicator.endRide(rating,driverId);
+        mNotificationManager.cancel(NOTIFICATION_ID);
+        finish();
+        //doBkash();
     }
 
 
@@ -228,6 +246,16 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
 
                 dialog.cancel();
                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:*247" + Uri.encode("#")));
+                if (ActivityCompat.checkSelfPermission(UserTaxiStatus.this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 startActivity(intent);
                 mNotificationManager.cancel(NOTIFICATION_ID);
                 finish();

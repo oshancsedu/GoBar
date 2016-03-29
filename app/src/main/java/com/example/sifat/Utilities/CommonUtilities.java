@@ -37,12 +37,13 @@ public class CommonUtilities {
     //GCM message tag
     public static final String RIDE_PAYMENT="payment";
 
-    public static final String SELECTED_USER_NAME = "selectedUserName";
-    public static final String SELECTED_USER_MOBILE = "selectedUserMobile";
-    public static final String SELECTED_USER_RATING = "selectedUserRating";
-    public static final String SELECTED_USER_ID = "selectedUserId";
+    public static final String SELECTED_DRIVER_NAME = "selectedDriverName";
+    public static final String SELECTED_DRIVER_MOBILE = "selectedDriverMobile";
+    public static final String SELECTED_DRIVER_RATING = "selectedDriverRating";
+    public static final String SELECTED_DRIVER_ID = "selectedDriverId";
     public static final String HIRE_STATUS_MESSAGE = "hireStatus";
     public static final String GCM_MESSAGE="message";
+    public static final String RIDE_REQUEST_RESPONSE = "rideResponse";
 
 
     public static final int SUCCESS_RESULT = 0;
@@ -62,10 +63,8 @@ public class CommonUtilities {
     public static final String DIST_LNG="distLng";
     public static final String SRC_LAT="srcLat";
     public static final String SRC_LNG="srcLng";
-    public static final String SELECTED_DRIVER_NAME = "selectedDriverName";
-    public static final String SELECTED_DRIVER_MOBILE = "selectedDriverMobile";
-    public static final String SELECTED_DRIVER_RATING = "selectedDriverRating";
-    public static final String SELECTED_DRIVER_ID = "selectedDriverId";
+
+
     public static final String NOTIFICATION_MANAGER = "notificationManager";
     public static final String IS_ON_HIRE = "isOnHire";
 
@@ -117,6 +116,7 @@ public class CommonUtilities {
     public static final String LOGIN_WITH_FB = "isLoginWithFacebook";
     public static final String USER_STATUS_WEBSITE="http://aimsil.com/uber/userInfo.php";
     public static final String RIDE_REQUEST_WEBSITE="http://aimsil.com/uber/rideRequest.php";
+    public static final String END_RIDE_WEBSITE="http://aimsil.com/uber/endRide.php";
 
 
     ///GCM Registration number

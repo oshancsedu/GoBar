@@ -43,7 +43,7 @@ public class DriverRating extends DialogFragment implements View.OnClickListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences(getString(R.string.sharedPref), Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPref(getActivity());
         driverName = sharedPreferences.getString(SELECTED_DRIVER_NAME, "null");
         rating = sharedPreferences.getFloat(SELECTED_DRIVER_RATING, 0.0f);
         getDialog().setTitle("Rate Your Driver");

@@ -11,6 +11,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.sifat.Utilities.CommonUtilities;
 import com.example.sifat.gobar.R;
@@ -45,12 +46,15 @@ public class OnRideService extends IntentService {
 
         status = bundle.getString(HIRE_STATUS_MESSAGE);
         message = bundle.getString(GCM_MESSAGE);
-
+        Log.i(LOG_TAG_GCM, status);
         if (status.equalsIgnoreCase("OK")) {
             isHired = true;
-            userName = bundle.getString(SELECTED_USER_NAME);
-            userID = bundle.getString(SELECTED_USER_ID);
-            userRating = Float.parseFloat(bundle.getString(SELECTED_USER_RATING));
+            userName = bundle.getString(SELECTED_DRIVER_NAME);
+            Log.i(LOG_TAG_GCM, userName);
+            userID = bundle.getString(SELECTED_DRIVER_ID);
+            userRating = Float.parseFloat(bundle.getString(SELECTED_DRIVER_RATING));
+            Log.i(LOG_TAG_GCM, "user Rate: "+userRating);
+
         } else {
             isHired = false;
         }
@@ -87,9 +91,9 @@ public class OnRideService extends IntentService {
 
         if (isHired) {
             builder.setOngoing(true);
-            editor.putString(SELECTED_USER_NAME, userName);
-            editor.putString(SELECTED_USER_ID, userID);
-            editor.putFloat(SELECTED_USER_RATING, userRating);
+            editor.putString(SELECTED_DRIVER_NAME, userName);
+            editor.putString(SELECTED_DRIVER_ID, userID);
+            editor.putFloat(SELECTED_DRIVER_RATING, userRating);
             editor.putBoolean(IS_ON_HIRE, isHired);
             editor.commit();
             builder.setContentIntent(contentIntent);

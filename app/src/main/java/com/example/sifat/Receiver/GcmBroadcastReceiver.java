@@ -8,7 +8,9 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.example.sifat.Services.GcmIntentService;
+import com.example.sifat.Services.OnRideService;
 import com.example.sifat.Services.PaymentService;
+import com.example.sifat.Utilities.CommonUtilities;
 
 import static com.example.sifat.Utilities.CommonUtilities.*;
 
@@ -26,7 +28,7 @@ public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
         Log.i(LOG_TAG_GCM, type);
         //Log.i(LOG_TAG_GCM, ""+cost);
 
-        if(type.equalsIgnoreCase(RIDE_REQUEST_RESPONSE))
+        if(type.equalsIgnoreCase(CommonUtilities.RIDE_REQUEST_RESPONSE))
         {
             comp = new ComponentName(context.getPackageName(),OnRideService.class.getName());
         }
