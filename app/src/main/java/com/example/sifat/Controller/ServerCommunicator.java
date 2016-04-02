@@ -261,6 +261,32 @@ public class ServerCommunicator {
         });
     }
 
+
+    public void startRide(String userId) {
+        String accessToken= sharedPreferences.getString(SERVER_ACCESS_TOKEN,"");
+        RequestParams requestParams = new RequestParams();
+        requestParams.put(SERVER_ACCESS_TOKEN,accessToken);
+        requestParams.put(USER_REGISTRATION_ID,userId);
+
+        final String rideStartWebsite = RIDE_START_WEBSITE;
+        Toast.makeText(context,rideStartWebsite,Toast.LENGTH_SHORT).show();
+
+        LoopjHttpClient.post(rideStartWebsite, requestParams, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                Log.i(LOG_TAG_LOGIN, new String(responseBody));
+                editor.putBoolean(IS_ON_RIDE, true);
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Log.i(LOG_TAG_LOGIN, new String(responseBody));
+            }
+        });
+    }
+
+
     public void endRide(float rating,String userId)
     {
         final RequestParams requestParams = new RequestParams();
@@ -389,7 +415,7 @@ public class ServerCommunicator {
             showToast(context,res);
 
         } catch (JSONException e) {
-            Log.i(LOG_TAG_LOGIN,"Error");
+            Log.i(LOG_TAG_LOGIN, "Error");
         }
     }
 

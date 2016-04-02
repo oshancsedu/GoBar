@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.example.sifat.gobar.R;
 
+import static com.example.sifat.Utilities.CommonUtilities.IS_ON_RIDE;
 import static com.example.sifat.Utilities.CommonUtilities.LOG_TAG_GCM;
 import static com.example.sifat.Utilities.CommonUtilities.NOTIFICATION_ID;
 import static com.example.sifat.Utilities.CommonUtilities.USER_BALANCE;
@@ -45,6 +46,7 @@ public class PaymentService extends IntentService {
         message = bundle.getString("cost");
         mBalance = Float.parseFloat(bundle.getString("total"));
         editor.putString(USER_BALANCE,""+mBalance);
+        editor.putBoolean(IS_ON_RIDE,false);
         editor.commit();
         message="Taka "+message+" has been added to your account";
         Log.i(LOG_TAG_GCM, message);

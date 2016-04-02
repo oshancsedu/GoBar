@@ -68,11 +68,12 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
     private String driverId;
     private DriverRating driverRating;
     private String driverName;
-    private FloatingActionButton fbReleaseTaxi;
+    private FloatingActionButton fbReleaseTaxi,fbWaitingState;
     private NotificationManager mNotificationManager;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private ServerCommunicator serverCommunicator;
+    private boolean isOnride;
 
 
     @Override
@@ -112,19 +113,39 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        sharedPreferences = getSharedPreferences(getString(R.string.sharedPref), Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPref(this);
         editor = sharedPreferences.edit();
 
         tvDriverMobile = (TextView) findViewById(R.id.tvDriverMobileNum);
         tvDrivername = (TextView) findViewById(R.id.tvDriverName);
         rbDriverRate = (RatingBar) findViewById(R.id.rbDriverRate);
         driverRating = new DriverRating();
+
         fbReleaseTaxi = (FloatingActionButton) findViewById(R.id.fbReleaseTaxi);
         fbReleaseTaxi.setOnClickListener(this);
+
+        fbWaitingState = (FloatingActionButton) findViewById(R.id.fbWaitingState);
+        fbWaitingState.setOnClickListener(this);
 
         serverCommunicator = new ServerCommunicator(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isOnride = sharedPreferences.getBoolean(IS_ON_RIDE,false);
+
+        if(isOnride)
+        {
+            fbReleaseTaxi.setVisibility(View.VISIBLE);
+            fbWaitingState.setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            fbReleaseTaxi.setVisibility(View.INVISIBLE);
+            fbWaitingState.setVisibility(View.VISIBLE);
+        }
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -228,7 +249,14 @@ public class UserTaxiStatus extends ActionBarActivity implements RouteApi,
 
     @Override
     public void onClick(View view) {
-        driverRating.show(getFragmentManager(), "Rate the Driver");
+        int id = view.getId();
+        if (id==R.id.fbReleaseTaxi)
+            driverRating.show(getFragmentManager(), "Rate the Driver");
+        else if(id==R.id.fbWaitingState){
+            fbReleaseTaxi.setVisibility(View.VISIBLE);
+            fbWaitingState.setVisibility(View.INVISIBLE);
+            serverCommunicator.startRide(driverId);
+        }
     }
 
 

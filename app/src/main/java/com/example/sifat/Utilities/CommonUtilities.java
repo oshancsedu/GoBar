@@ -117,6 +117,10 @@ public class CommonUtilities {
     public static final String USER_STATUS_WEBSITE="http://aimsil.com/uber/userInfo.php";
     public static final String RIDE_REQUEST_WEBSITE="http://aimsil.com/uber/rideRequest.php";
     public static final String END_RIDE_WEBSITE="http://aimsil.com/uber/endRide.php";
+    public static final String RIDE_START_WEBSITE = "http://aimsil.com/uber/StartRide.php";
+
+    //pref Tags
+    public static final String IS_ON_RIDE="isOnRide";
 
 
     ///GCM Registration number

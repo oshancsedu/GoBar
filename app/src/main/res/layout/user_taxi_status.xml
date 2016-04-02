@@ -85,6 +85,19 @@
 
         </LinearLayout>
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fbWaitingState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/llDriverInfoPanel"
+            android:layout_marginRight="10dp"
+            app:backgroundTint="@color/red_700"
+            android:src="@drawable/ic_waiting"
+            app:borderWidth="0dp"
+            app:fabSize="normal" />
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fbReleaseTaxi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -92,8 +105,10 @@
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/llDriverInfoPanel"
             android:layout_marginRight="10dp"
-            android:src="@drawable/ic_action_undo"
+            app:backgroundTint="@color/green_700"
+            android:src="@drawable/ic_onride"
             app:borderWidth="0dp"
             app:fabSize="normal" />
+
     </RelativeLayout>
 </LinearLayout>
